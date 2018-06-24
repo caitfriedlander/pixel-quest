@@ -38,15 +38,8 @@ function Character() {
     this.timeMoved = 0;
     this.dimensions = [15, 15];
     this.position = [45,45];
-    this.delayMove = 700;
 }
 
-//placement method
-CharacterData.prototype.placeAt = function(x, y) {
-    this.tileFrom = [x,y];
-    this.tileTo = [x,y];
-    this.position = [((tileWidth*x)+((tileWidth-this.dimensions[0])/2)), ((tileHeight*y)+((tileHeight-this.dimensions[1])/2))];
-};
 
 // EVENT HANDLERS
 
