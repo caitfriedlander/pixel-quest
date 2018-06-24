@@ -24,7 +24,7 @@ var gameMap = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 //tile width/height
-var tileWidth = 20, tileHeight = 20;
+var tileWidth = 30, tileHeight = 30;
 //map width/height
 var mapWidth = 20, mapHeight = 20;
 //counts frames to make sure the loop is working
@@ -36,7 +36,7 @@ function Character() {
     this.tileFrom = [1,1];
     this.tileTo = [1,1];
     this.timeMoved = 0;
-    this.dimensions = [10, 10];
+    this.dimensions = [15, 15];
     this.position = [45,45];
     this.delayMove = 700;
 }
