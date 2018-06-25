@@ -1,4 +1,4 @@
-// GLOBAL VARIABLES
+// GLOBAL VARIABLES (State)
 var ctx = null;
 //tile width/height
 var tileWidth = 30, tileHeight = 30;
@@ -15,8 +15,6 @@ var keysDown = {
     39: false,
     40: false
 }
-// player
-var player = new Sprite([1,1], [1,1], 0, [15, 15], [30,30], 600, 3);
 
 //game map modeled as an array
 var gameMap = [
@@ -42,7 +40,7 @@ var gameMap = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
-//refactor as class
+//Sprite Class
 class Sprite {
     constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction) {
         this.tileFrom = tileFrom;
@@ -62,7 +60,41 @@ class Sprite {
         this.position = [((tileWidth * x) + ((tileWidth - this.dimensions[0])/2)), 
         ((tileHeight * y) + (tileHeight - this.dimensions[1])/2)];
     }
+    processMovement(t) {
+        if (this.tileFrom[0] === this.tileTo[0] && 
+            this.tileFrom[1] === this.tileTo[1]) {
+                return false;
+        }
+        if ((t-this.timeMoved) >= this.speed) {
+            this.placeAt(this.tileTo[0], this.tileTo[1]);
+        } else {
+            this.position[0] = (this.tileFrom[0] * tileWidth) + ((tileWidth - this.dimensions[0])/2);
+            this.position[1] = (this.tileFrom[1] * tileHeight) + ((tileHeight - this.dimensions[1])/2);
+            
+            if (this.tileTo[0] != this.tileFrom[0]) {
+                var diff =  (tileWidth / this.speed) * (t-this.timeMoved);
+                this.position[0]+= (this.tileTo[0] < this.tileFrom[0] ? 0 - diff : diff);
+            }
+            if (this.tileTo[1] != this.tileFrom[1]) {
+                var diff =  (tileHeight / this.speed) * (t-this.timeMoved);
+                this.position[1]+= (this.tileTo[1] < this.tileFrom[1] ? 0 - diff : diff);
+            }
+            this.position[0] = Math.round(this.position[0]);
+            this.position[1] = Math.round(this.position[1]);
+        }
+        return true;
+    }
+    toIndex(x,y) {
+        return ((y * mapWidth) + x);
+    }
 };
+
+// player
+var player = new Sprite([1,1], [1,1], 0, [15, 15], [30,30], 600, 3);
+
+// enemies
+    //create an array of enemy objects to be looped through later
+    //each enemy needs a unique starting position and a movement method
 
 //inventory
 var inventoryArr = [
@@ -86,58 +118,99 @@ window.onload = function() {
     ctx = document.getElementById('game').getContext("2d");
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
-
-    //sprite motion function
-        //player
-        //enemy
-
-    //inventory function
-        //if player character position === item position
-            // pickup function
-                //remove item from board
-                //place in inventory
-
-    //health function
-
-    //main function
-    function drawGame() {
-        if(ctx === null) {
-            return;
+    window.addEventListener("keydown", function(evt) {
+        if (evt.keyCode >= 37 && evt.keyCode <= 40) {
+            keysDown[evt.keyCode] = true;
         }
-        //frame counter
-        var sec = Math.floor(Date.now()/1000);
-        if(sec!=currentSecond)
-        {
-            currentSecond = sec;
-            framesLastSecond = frameCount;
-            frameCount =1;
+    });
+    window.addEventListener("keyup", function(evt) {
+        if (evt.keyCode >= 37 && evt.keyCode <= 40) {
+            keysDown[evt.keyCode] = false;
         }
-        else {
-            frameCount++;
-        }
-        //drawing loops: traverse the array row by row and finds each collumn index inside
-        for (var y = 0; y < mapHeight; y++) {
-            for (var x = 0; x < mapWidth; x++) {
-                if (gameMap[((y*mapWidth)+x)] === 0) {
-                    ctx.fillStyle = "#000000";
-                } else {
-                    ctx.fillStyle = "lightblue";
-                }
-                ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
-            }
-        }
-
-        //sprite render function
-
-        //win logic
-
-        //lose logic
-        
-        ctx.fillStyle = "#ff0000";
-        // ctx.fillText(framesLastSecond, 10, 20);
-        requestAnimationFrame(drawGame);
-        // if (!winner) requestAnimationFrame(drawGame);
-    }
+    })
 
 };
+
+//sprite motion function
+    //player
+    //enemy
+
+//inventory function
+    //if player character position === item position
+        // pickup function
+            //remove item from board
+            //place in inventory
+
+//health function
+
+//main function
+function drawGame() {
+    if(ctx === null) {
+        return;
+    }
+
+    var currentFrameTime = Date.now();
+    var timeElapsed = currentFrameTime - lastFrameTime;
+
+    //frame counter
+    var sec = Math.floor(Date.now()/1000);
+    if(sec!=currentSecond)
+    {
+        currentSecond = sec;
+        framesLastSecond = frameCount;
+        frameCount = 1;
+    }
+    else {
+        frameCount++;
+    }
+
+    //check to see if player is moving
+    if (!player.processMovement(currentFrameTime)) {
+        if (keysDown[38] && player.tileFrom[1]>0 && 
+            gameMap[player.toIndex(player.tileFrom[0], player.tileFrom[1]-1)]==1) { 
+                player.tileTo[1]-= 1; 
+            } else if (keysDown[40] && player.tileFrom[1]<(mapHeight-1) &&
+            gameMap[player.toIndex(player.tileFrom[0], player.tileFrom[1]+1)]==1) { 
+                player.tileTo[1]+= 1; 
+            } else if (keysDown[37] && player.tileFrom[0]>0 &&
+            gameMap[player.toIndex(player.tileFrom[0]-1, player.tileFrom[1])]==1) { 
+                player.tileTo[0]-= 1; 
+            } else if (keysDown[39] && player.tileFrom[0]<(mapWidth-1) && 
+            gameMap[player.toIndex(player.tileFrom[0]+1, player.tileFrom[1])]==1) { 
+                player.tileTo[0]+= 1; 
+            }
+        if (player.tileFrom[0] !== player.tileTo[0] || 
+            player.tileFrom[1] !== player.tileTo[1]) {
+                player.timeMoved = currentFrameTime;
+        }
+    }
+                
+    //Render board
+    for (var y = 0; y < mapHeight; y++) {
+        for (var x = 0; x < mapWidth; x++) {
+            if (gameMap[((y*mapWidth)+x)] === 0) {
+                ctx.fillStyle = "#000000";
+            } else {
+                ctx.fillStyle = "lightblue";
+            }
+            ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
+        }
+    }
+
+    //render player
+    ctx.fillStyle = "pink";
+    ctx.fillRect(player.position[0], player.position[1], 
+        player.dimensions[0], player.dimensions[1]);
+
+    //win logic
+
+    //lose logic
+    
+    ctx.fillStyle = "#ff0000";
+    // ctx.fillText(framesLastSecond, 10, 20);
+    lastFrameTime = currentFrameTime;
+    requestAnimationFrame(drawGame);
+    // if (!winner) requestAnimationFrame(drawGame);
+};
+
 
