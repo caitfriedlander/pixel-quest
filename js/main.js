@@ -1,22 +1,19 @@
 // GLOBAL VARIABLES (State)
 var ctx = null;
-//tile width/height
-var tileWidth = 30, tileHeight = 30;
-//map width/height
-var mapWidth = 20, mapHeight = 20;
+var player;
+var enemies = [];
+//Arrow Keys
+var keysDown = { 37: false, 38: false, 39: false, 40: false }
 //counts frames to make sure the loop is working
 var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
 //last time a frame was drawn
 var lastFrameTime = 0;
-//Arrow Keys
-var keysDown = {
-    37: false,
-    38: false,
-    39: false,
-    40: false
-}
+//tile width/height
+var tileWidth = 30, tileHeight = 30;
+//map width/height
+var mapWidth = 20, mapHeight = 20;
 
-//game map modeled as an array
+//GAME MAP
 var gameMap = [
     0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
@@ -40,11 +37,7 @@ var gameMap = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
-var floorTypes = {
-    solid: 0,
-    path: 1,
-    door: 2
-}
+var floorTypes = { solid: 0, path: 1, door: 2 }
 
 var tileTypes = {
     0: {color: "#9bcfc2", floor: floorTypes.solid},
@@ -53,7 +46,7 @@ var tileTypes = {
     3: {color: "#c2cf9b", floor: floorTypes.door}
 }
 
-//Sprite Class
+//SPRITES
 class Sprite {
     constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction) {
         this.tileFrom = tileFrom;
@@ -79,98 +72,99 @@ class Sprite {
             this.tileFrom[1] === this.tileTo[1]) {
                 //not moving
                 return false;
-        }
-        if ((t-this.timeMoved) >= this.speed) {
-            //move tile and keep it from moving without user input
-            this.placeAt(this.tileTo[0], this.tileTo[1]);
-        } else {
-            this.position[0] = (this.tileFrom[0] * tileWidth) + ((tileWidth - this.dimensions[0])/2);
-            this.position[1] = (this.tileFrom[1] * tileHeight) + ((tileHeight - this.dimensions[1])/2);
-            //up/down
-            if (this.tileTo[0] != this.tileFrom[0]) {
-                var diff =  (tileWidth / this.speed) * (t-this.timeMoved);
-                this.position[0]+= (this.tileTo[0] < this.tileFrom[0] ? 0 - diff : diff);
             }
-            //left/right
-            if (this.tileTo[1] != this.tileFrom[1]) {
-                var diff =  (tileHeight / this.speed) * (t-this.timeMoved);
-                this.position[1]+= (this.tileTo[1] < this.tileFrom[1] ? 0 - diff : diff);
+            if ((t-this.timeMoved) >= this.speed) {
+                //move tile and keep it from moving without user input
+                this.placeAt(this.tileTo[0], this.tileTo[1]);
+            } else {
+                this.position[0] = (this.tileFrom[0] * tileWidth) + ((tileWidth - this.dimensions[0])/2);
+                this.position[1] = (this.tileFrom[1] * tileHeight) + ((tileHeight - this.dimensions[1])/2);
+                //up/down
+                if (this.tileTo[0] != this.tileFrom[0]) {
+                    var diff =  (tileWidth / this.speed) * (t-this.timeMoved);
+                    this.position[0]+= (this.tileTo[0] < this.tileFrom[0] ? 0 - diff : diff);
+                }
+                //left/right
+                if (this.tileTo[1] != this.tileFrom[1]) {
+                    var diff =  (tileHeight / this.speed) * (t-this.timeMoved);
+                    this.position[1]+= (this.tileTo[1] < this.tileFrom[1] ? 0 - diff : diff);
+                }
+                //smoothing movement
+                this.position[0] = Math.round(this.position[0]);
+                this.position[1] = Math.round(this.position[1]);
             }
-            //smoothing movement
-            this.position[0] = Math.round(this.position[0]);
-            this.position[1] = Math.round(this.position[1]);
+            return true;
         }
-        return true;
-    }
-    //is this space open
-    canMoveTo(x, y) {
-        //if out of bounds
-        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
-            return false;
-        }
-        //if not a path tile
-        if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.path) {
-            return false;
-        }
-        return true;
+        //is this space open
+        canMoveTo(x, y) {
+            //if out of bounds
+            if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
+                return false;
+            }
+            //if not a path tile
+            if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.path) {
+                return false;
+            }
+            return true;
+        };
+        //moves the character to an available space in the corresponding direction
+        canMoveUp() {
+            return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]-1);
+        };
+        canMoveDown() {
+            return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]+1);
+        };
+        canMoveLeft() {
+            return this.canMoveTo(this.tileFrom[0]-1, this.tileFrom[1]);
+        };
+        canMoveRight() {
+            return this.canMoveTo(this.tileFrom[0]+1, this.tileFrom[1]);
+        };
+        //improve timing on movement when a destination is set
+        moveUp(t){
+            this.tileTo[1] -= 1; this.timeMoved = t;
+        };
+        moveDown(t){
+            this.tileTo[1] += 1; this.timeMoved = t;
+        };
+        moveLeft(t){
+            this.tileTo[0] -= 1; this.timeMoved = t;
+        };
+        moveRight(t){
+            this.tileTo[0] += 1; this.timeMoved = t;
+        };
+        
     };
-    //moves the character to an available space in the corresponding direction
-    canMoveUp() {
-        return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]-1);
-    };
-    canMoveDown() {
-        return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]+1);
-    };
-    canMoveLeft() {
-        return this.canMoveTo(this.tileFrom[0]-1, this.tileFrom[1]);
-    };
-    canMoveRight() {
-        return this.canMoveTo(this.tileFrom[0]+1, this.tileFrom[1]);
-    };
-    //improve timing on movement when a destination is set
-    moveUp(t){
-        this.tileTo[1] -= 1; this.timeMoved = t;
-    };
-    moveDown(t){
-        this.tileTo[1] += 1; this.timeMoved = t;
-    };
-    moveLeft(t){
-        this.tileTo[0] -= 1; this.timeMoved = t;
-    };
-    moveRight(t){
-        this.tileTo[0] += 1; this.timeMoved = t;
-    };
+    
+    // player
+    player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
+    
+    // enemies
+    var e1 = new Sprite();
+    var e2 = new Sprite();
+    //create an array of enemy objects to be looped through later
+    //each enemy needs a unique starting position and a movement method
+    
+    //inventory
+    var inventoryArr = [
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0
+    ];
+    
+    //health
+    
+// EVENT HANDLERS (GLOBAL)
 
-};
+
+// FUNCTIONS
 
 //Helper Function for finding EXACT position in the gameMap array
 function toIndex(x,y) {
     return ((y * mapWidth) + x);
 }
 
-// player
-var player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
-
-// enemies
-    //create an array of enemy objects to be looped through later
-    //each enemy needs a unique starting position and a movement method
-
-//inventory
-var inventoryArr = [
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0
-];
-
-//health
-
-//tile types
-
-// EVENT HANDLERS (GLOBAL)
-
-
-// FUNCTIONS
 //rewrite as initialize 
 window.onload = function() {
     //starts the loop
