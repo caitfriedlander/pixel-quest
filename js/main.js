@@ -4,23 +4,23 @@ var ctx = null;
 var gameMap = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
-	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0,
-	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
 	0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-	0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0,
+	0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0,
 	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-	0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
-    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-    0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
-	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
+	0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+	0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
+    0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
+    0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0,
+	0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
+	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0,
 	0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-	0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-	0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0,
-	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0,
+	0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+	0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0,
+	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 //tile width/height
@@ -29,17 +29,32 @@ var tileWidth = 30, tileHeight = 30;
 var mapWidth = 20, mapHeight = 20;
 //counts frames to make sure the loop is working
 var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
-// player
-var player = new Character();
 
-function Character() {
+// player
+var player = new Sprite();
+
+function Sprite() {
     this.tileFrom = [1,1];
     this.tileTo = [1,1];
     this.timeMoved = 0;
     this.dimensions = [15, 15];
     this.position = [45,45];
+    this.speed = 600;
+    this.health = 3;
+    // inventory, direction facing, movement method
 }
 
+//inventory
+var inventory = [
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0
+];
+
+//health
+
+//tile types
 
 // EVENT HANDLERS
 
@@ -57,6 +72,18 @@ window.onload = function()
     ctx = document.getElementById('game').getContext("2d");
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
+
+    //sprite motion function
+        //player
+        //enemy
+
+    //inventory function
+        //if player character position === item position
+            // pickup function
+                //remove item from board
+                //place in inventory
+
+    //health function
 
     //main function
     function drawGame() {
@@ -80,14 +107,20 @@ window.onload = function()
                 if (gameMap[((y*mapWidth)+x)] === 0) {
                     ctx.fillStyle = "#000000";
                 } else {
-                    ctx.fillStyle = "#ccffcc";
+                    ctx.fillStyle = "lightblue";
                 }
                 ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
             }
         }
+
+        //sprite render function
+
+        //win logic
+
+        //lose logic
         
         ctx.fillStyle = "#ff0000";
-        // ctx.fillText("FPS: " + framesLastSecond, 10, 20);
+        // ctx.fillText(framesLastSecond, 10, 20);
         requestAnimationFrame(drawGame);
     }
 
