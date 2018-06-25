@@ -40,6 +40,21 @@ var gameMap = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
+var floorTypes = {
+    solid: 0,
+    path: 1,
+    water: 2,
+    door: 3
+}
+
+var tileTypes = {
+    0 : {color: "#9bcfc2", floor: floorTypes.solid},
+    1 : {color: "#ADD8E6", floor: floorTypes.path},
+    2 : {color: "#9BC2CF", floor: floorTypes.path},
+    3 : {color: "#67A2B6", floor: floorTypes.water},
+    4 : {color: "#c2cf9b", floor: floorTypes.door}
+}
+
 //Sprite Class
 class Sprite {
     constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction) {
@@ -198,7 +213,7 @@ function drawGame() {
     }
 
     //render player
-    ctx.fillStyle = "pink";
+    ctx.fillStyle = "#cf9bc2";
     ctx.fillRect(player.position[0], player.position[1], 
         player.dimensions[0], player.dimensions[1]);
 
