@@ -1,5 +1,23 @@
 // GLOBAL VARIABLES
 var ctx = null;
+//tile width/height
+var tileWidth = 30, tileHeight = 30;
+//map width/height
+var mapWidth = 20, mapHeight = 20;
+//counts frames to make sure the loop is working
+var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
+//last time a frame was drawn
+var lastFrameTime = 0;
+//Arrow Keys
+var keysDown = {
+    37: false,
+    38: false,
+    39: false,
+    40: false
+}
+// player
+var player = new Sprite([1,1], [1,1], 0, [15, 15], [30,30], 600, 3);
+
 //game map modeled as an array
 var gameMap = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -23,29 +41,31 @@ var gameMap = [
 	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
-//tile width/height
-var tileWidth = 30, tileHeight = 30;
-//map width/height
-var mapWidth = 20, mapHeight = 20;
-//counts frames to make sure the loop is working
-var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
 
-// player
-var player = new Sprite();
-
-function Sprite() {
-    this.tileFrom = [1,1];
-    this.tileTo = [1,1];
-    this.timeMoved = 0;
-    this.dimensions = [15, 15];
-    this.position = [45,45];
-    this.speed = 600;
-    this.health = 3;
-    // inventory, direction facing, movement method
-}
+//refactor as class
+class Sprite {
+    constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction) {
+        this.tileFrom = tileFrom;
+        this.tileTo = tileTo;
+        this.timeMoved = timeMoved;
+        this.dimensions = dimensions;
+        this.position = position;
+        this.speed = speed;
+        this.health = health;
+        this.inventory = inventory;
+        this.direction = direction;
+        // movement method
+    }
+    placeAt(x,y) {
+        this.tileFrom = [x,y];
+        this.tileTo = [x,y];
+        this.position = [((tileWidth * x) + ((tileWidth - this.dimensions[0])/2)), 
+        ((tileHeight * y) + (tileHeight - this.dimensions[1])/2)];
+    }
+};
 
 //inventory
-var inventory = [
+var inventoryArr = [
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,
@@ -58,16 +78,10 @@ var inventory = [
 
 // EVENT HANDLERS
 
-var keysDown = {
-    37: false,
-    38: false,
-    39: false,
-    40: false
-}
 
 // FUNCTIONS
-window.onload = function()
-{
+//rewrite as initialize 
+window.onload = function() {
     //starts the loop
     ctx = document.getElementById('game').getContext("2d");
     requestAnimationFrame(drawGame);
@@ -122,6 +136,8 @@ window.onload = function()
         ctx.fillStyle = "#ff0000";
         // ctx.fillText(framesLastSecond, 10, 20);
         requestAnimationFrame(drawGame);
+        // if (!winner) requestAnimationFrame(drawGame);
     }
 
 };
+
