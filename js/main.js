@@ -1,7 +1,6 @@
 // GLOBAL VARIABLES (State)
 var ctx = null;
 var player;
-var enemies = [];
 //Arrow Keys
 var keysDown = { 37: false, 38: false, 39: false, 40: false }
 //counts frames to make sure the loop is working
@@ -33,17 +32,18 @@ var gameMap = [
 	0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 	0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0,
-	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 3,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0
 ];
 
-var floorTypes = { solid: 0, path: 1, door: 2 }
+var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3 }
 
 var tileTypes = {
     0: {color: "#9bcfc2", floor: floorTypes.solid},
     1: {color: "#ADD8E6", floor: floorTypes.path},
     2: {color: "#c2cf9b", floor: floorTypes.solid},
-    3: {color: "#c2cf9b", floor: floorTypes.door}
+    3: {color: "#c2cf9b", floor: floorTypes.lockedDoor},
+    4: {color: "#c2cfcf", floor: floorTypes.unlockedDoor}
 }
 
 //SPRITES
@@ -101,9 +101,15 @@ class Sprite {
             if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
                 return false;
             }
+            //if ocupied by an enemy
+            
             //if not a path tile
             if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.path) {
-                return false;
+                if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.unlockedDoor) {
+                    return false;
+                } else {
+                    return true;
+                }
             }
             return true;
         };
@@ -140,10 +146,30 @@ class Sprite {
     player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
     
     // enemies
-    var e1 = new Sprite();
-    var e2 = new Sprite();
+    var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
+    var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
+
     //create an array of enemy objects to be looped through later
+    var enemies = [e1, e2];
+
     //each enemy needs a unique starting position and a movement method
+
+    //LOOT CLASS
+    class Loot {
+        constructor(dimensions, position, type, inInventory) {
+            this.dimensions = dimensions;
+            this.position = position;
+            this.type = type;
+            this.inInventory = false;
+        }
+    }
+
+    var lootType = {
+        1: {label: "apple", purpose: "heal", color: "green"},
+        2: {label: "gold", purpose: "score increase", color: "yellow"}
+    }
+
+
     
     //inventory
     var inventoryArr = [
@@ -152,11 +178,13 @@ class Sprite {
         0, 0, 0,
         0, 0, 0
     ];
-    
+
     //health
     
 // EVENT HANDLERS (GLOBAL)
 
+    //start button function to launch game
+        //call initialize and start game loop
 
 // FUNCTIONS
 
@@ -165,8 +193,8 @@ function toIndex(x,y) {
     return ((y * mapWidth) + x);
 }
 
-//rewrite as initialize 
-window.onload = function() {
+//Initialize function
+function initialize() {
     //starts the loop
     ctx = document.getElementById('game').getContext("2d");
     requestAnimationFrame(drawGame);
@@ -214,6 +242,14 @@ function drawGame() {
     else {
         frameCount++;
     }
+        
+    //Render board
+    for (var y = 0; y < mapHeight; y++) {
+        for (var x = 0; x < mapWidth; x++) {
+        ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].color;
+        ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
+        }
+    }
 
     //check to see if player is moving
     if (!player.processMovement(currentFrameTime)) {
@@ -227,19 +263,19 @@ function drawGame() {
             player.moveRight(currentFrameTime)
         }
     }
-                
-    //Render board
-    for (var y = 0; y < mapHeight; y++) {
-        for (var x = 0; x < mapWidth; x++) {
-            ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].color;
-            ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
-        }
-    }
 
     //render player
     ctx.fillStyle = "#cf9bc2";
     ctx.fillRect(player.position[0], player.position[1], 
         player.dimensions[0], player.dimensions[1]);
+    
+    //render enemies
+
+    enemies.forEach(function(e) {
+        ctx.fillStyle = "red";
+        ctx.fillRect(e.position[0], e.position[1], 
+            e.dimensions[0], e.dimensions[1]);
+        });
 
     //win logic
 
@@ -252,4 +288,4 @@ function drawGame() {
     // if (!winner) requestAnimationFrame(drawGame);
 };
 
-
+initialize();
