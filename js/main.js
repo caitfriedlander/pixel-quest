@@ -18,7 +18,7 @@ var keysDown = {
 
 //game map modeled as an array
 var gameMap = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
 	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
@@ -36,23 +36,21 @@ var gameMap = [
 	0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 	0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0,
-	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0,
+	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 3,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
 var floorTypes = {
     solid: 0,
     path: 1,
-    water: 2,
-    door: 3
+    door: 2
 }
 
 var tileTypes = {
-    0 : {color: "#9bcfc2", floor: floorTypes.solid},
-    1 : {color: "#ADD8E6", floor: floorTypes.path},
-    2 : {color: "#9BC2CF", floor: floorTypes.path},
-    3 : {color: "#67A2B6", floor: floorTypes.water},
-    4 : {color: "#c2cf9b", floor: floorTypes.door}
+    0: {color: "#9bcfc2", floor: floorTypes.solid},
+    1: {color: "#ADD8E6", floor: floorTypes.path},
+    2: {color: "#c2cf9b", floor: floorTypes.solid},
+    3: {color: "#c2cf9b", floor: floorTypes.door}
 }
 
 //Sprite Class
@@ -67,42 +65,88 @@ class Sprite {
         this.health = health;
         this.inventory = inventory;
         this.direction = direction;
-        // movement method
     }
+    //places the sprite on the board
     placeAt(x,y) {
         this.tileFrom = [x,y];
         this.tileTo = [x,y];
         this.position = [((tileWidth * x) + ((tileWidth - this.dimensions[0])/2)), 
         ((tileHeight * y) + (tileHeight - this.dimensions[1])/2)];
     }
+    //movement method
     processMovement(t) {
         if (this.tileFrom[0] === this.tileTo[0] && 
             this.tileFrom[1] === this.tileTo[1]) {
+                //not moving
                 return false;
         }
         if ((t-this.timeMoved) >= this.speed) {
+            //move tile and keep it from moving without user input
             this.placeAt(this.tileTo[0], this.tileTo[1]);
         } else {
             this.position[0] = (this.tileFrom[0] * tileWidth) + ((tileWidth - this.dimensions[0])/2);
             this.position[1] = (this.tileFrom[1] * tileHeight) + ((tileHeight - this.dimensions[1])/2);
-            
+            //up/down
             if (this.tileTo[0] != this.tileFrom[0]) {
                 var diff =  (tileWidth / this.speed) * (t-this.timeMoved);
                 this.position[0]+= (this.tileTo[0] < this.tileFrom[0] ? 0 - diff : diff);
             }
+            //left/right
             if (this.tileTo[1] != this.tileFrom[1]) {
                 var diff =  (tileHeight / this.speed) * (t-this.timeMoved);
                 this.position[1]+= (this.tileTo[1] < this.tileFrom[1] ? 0 - diff : diff);
             }
+            //smoothing movement
             this.position[0] = Math.round(this.position[0]);
             this.position[1] = Math.round(this.position[1]);
         }
         return true;
     }
-    toIndex(x,y) {
-        return ((y * mapWidth) + x);
-    }
+    //is this space open
+    canMoveTo(x, y) {
+        //if out of bounds
+        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
+            return false;
+        }
+        //if not a path tile
+        if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.path) {
+            return false;
+        }
+        return true;
+    };
+    //moves the character to an available space in the corresponding direction
+    canMoveUp() {
+        return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]-1);
+    };
+    canMoveDown() {
+        return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]+1);
+    };
+    canMoveLeft() {
+        return this.canMoveTo(this.tileFrom[0]-1, this.tileFrom[1]);
+    };
+    canMoveRight() {
+        return this.canMoveTo(this.tileFrom[0]+1, this.tileFrom[1]);
+    };
+    //improve timing on movement when a destination is set
+    moveUp(t){
+        this.tileTo[1] -= 1; this.timeMoved = t;
+    };
+    moveDown(t){
+        this.tileTo[1] += 1; this.timeMoved = t;
+    };
+    moveLeft(t){
+        this.tileTo[0] -= 1; this.timeMoved = t;
+    };
+    moveRight(t){
+        this.tileTo[0] += 1; this.timeMoved = t;
+    };
+
 };
+
+//Helper Function for finding EXACT position in the gameMap array
+function toIndex(x,y) {
+    return ((y * mapWidth) + x);
+}
 
 // player
 var player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
@@ -123,7 +167,7 @@ var inventoryArr = [
 
 //tile types
 
-// EVENT HANDLERS
+// EVENT HANDLERS (GLOBAL)
 
 
 // FUNCTIONS
@@ -133,6 +177,8 @@ window.onload = function() {
     ctx = document.getElementById('game').getContext("2d");
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
+
+    //Event Handlers (Game)
     window.addEventListener("keydown", function(evt) {
         if (evt.keyCode >= 37 && evt.keyCode <= 40) {
             keysDown[evt.keyCode] = true;
@@ -145,10 +191,6 @@ window.onload = function() {
     })
 
 };
-
-//sprite motion function
-    //player
-    //enemy
 
 //inventory function
     //if player character position === item position
@@ -181,33 +223,21 @@ function drawGame() {
 
     //check to see if player is moving
     if (!player.processMovement(currentFrameTime)) {
-        if (keysDown[38] && player.tileFrom[1]>0 && 
-            gameMap[player.toIndex(player.tileFrom[0], player.tileFrom[1]-1)]==1) { 
-                player.tileTo[1]-= 1; 
-            } else if (keysDown[40] && player.tileFrom[1]<(mapHeight-1) &&
-            gameMap[player.toIndex(player.tileFrom[0], player.tileFrom[1]+1)]==1) { 
-                player.tileTo[1]+= 1; 
-            } else if (keysDown[37] && player.tileFrom[0]>0 &&
-            gameMap[player.toIndex(player.tileFrom[0]-1, player.tileFrom[1])]==1) { 
-                player.tileTo[0]-= 1; 
-            } else if (keysDown[39] && player.tileFrom[0]<(mapWidth-1) && 
-            gameMap[player.toIndex(player.tileFrom[0]+1, player.tileFrom[1])]==1) { 
-                player.tileTo[0]+= 1; 
-            }
-        if (player.tileFrom[0] !== player.tileTo[0] || 
-            player.tileFrom[1] !== player.tileTo[1]) {
-                player.timeMoved = currentFrameTime;
+        if (keysDown[38] && player.canMoveUp()) {
+            player.moveUp(currentFrameTime)
+        } else if (keysDown[40] && player.canMoveDown()) {
+            player.moveDown(currentFrameTime)
+        } else if (keysDown[37] && player.canMoveLeft()) {
+            player.moveLeft(currentFrameTime)
+        } else if (keysDown[39] && player.canMoveRight()) {
+            player.moveRight(currentFrameTime)
         }
     }
                 
     //Render board
     for (var y = 0; y < mapHeight; y++) {
         for (var x = 0; x < mapWidth; x++) {
-            if (gameMap[((y*mapWidth)+x)] === 0) {
-                ctx.fillStyle = "#000000";
-            } else {
-                ctx.fillStyle = "lightblue";
-            }
+            ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].color;
             ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
         }
     }
