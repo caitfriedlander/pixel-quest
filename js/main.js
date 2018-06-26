@@ -1,8 +1,7 @@
-// GLOBAL VARIABLES (State)
+/* GLOBAL VARIABLES (State) */
 var ctx = null;
 var player;
 var score = 0;
-var canvas;
 //Arrow Keys
 var keysDown = { 37: false, 38: false, 39: false, 40: false }
 //counts frames to make sure the loop is working
@@ -13,6 +12,10 @@ var lastFrameTime = 0;
 var tileWidth = 30, tileHeight = 30;
 //map width/height
 var mapWidth = 20, mapHeight = 20;
+
+/* Cached Elements */
+var canvas = document.querySelector('canvas');
+
 
 //GAME MAP
 var gameMap = [
@@ -111,9 +114,12 @@ class Sprite {
                 if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.unlockedDoor) {
                     return false;
                 } else {
+                    //run winfunction
+                    winGame();
                     return true;
                 }
             }
+            if ()
             return true;
         };
         //moves the character to an available space in the corresponding direction
@@ -151,6 +157,10 @@ class Sprite {
     // enemies
     var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
     var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
+    var e3 = new Sprite([1,3], [1,3], 0, [20, 20], [545, 455], 600);
+    var e4 = new Sprite([1,3], [1,3], 0, [20, 20], [155, 355], 600);
+    var e5 = new Sprite([1,3], [1,3], 0, [20, 20], [65, 545], 600);
+    var e6 = new Sprite([1,3], [1,3], 0, [20, 20], [305, 95], 600);
 
     //create an array of enemy objects to be looped through later
     var enemies = [e1, e2];
@@ -173,7 +183,6 @@ class Sprite {
     }
 
 
-    
     //inventory
     var inventoryArr = [
         0, 0, 0,
@@ -181,10 +190,8 @@ class Sprite {
         0, 0, 0,
         0, 0, 0
     ];
-
-    //health
     
-// EVENT HANDLERS (GLOBAL)
+/* EVENT HANDLERS (GLOBAL) */
 
 //start button
 document.getElementById('start').addEventListener('click', startGame)
@@ -193,7 +200,7 @@ document.getElementById('start').addEventListener('click', startGame)
 document.getElementById('restart').addEventListener('click', restartGame)
 
 
-// FUNCTIONS
+/* FUNCTIONS */
 
 //Helper Function for finding EXACT position in the gameMap array
 function toIndex(x,y) {
@@ -215,7 +222,8 @@ function startGame() {
     //this should be a separate startGame function
     //starts the loop
     ctx = document.getElementById('game').getContext("2d");
-
+    canvas.style.width = '600px';
+    canvas.style.height = '600px';
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
 
@@ -249,6 +257,25 @@ function restartGame() {
             //place in inventory
 
 //health function
+
+function loseHeatlth() {
+    player.health -= 1;
+}
+
+function gainHealth() {
+    if (player.health >3) {
+        player.health +=1;
+    }
+}
+
+   
+//win logic
+function winGame() {
+    //launch win message
+    console.log('you win!');
+}
+
+//lose logic
 
 //main function
 function drawGame() {
@@ -305,16 +332,13 @@ function drawGame() {
             e.dimensions[0], e.dimensions[1]);
         });
 
-    //win logic
-
-    //lose logic
-    
-    ctx.fillStyle = "#ff0000";
-    // ctx.fillText(framesLastSecond, 10, 20);
-    lastFrameTime = currentFrameTime;
-    requestAnimationFrame(drawGame);
-    // if (!winner) requestAnimationFrame(drawGame);
-};
+        ctx.fillStyle = "#ff0000";
+        // ctx.fillText(framesLastSecond, 10, 20);
+        lastFrameTime = currentFrameTime;
+        requestAnimationFrame(drawGame);
+        // if (!winner) requestAnimationFrame(drawGame);
+    };
+ 
 
 startGame();
 initialize();
