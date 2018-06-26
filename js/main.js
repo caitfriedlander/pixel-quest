@@ -1,6 +1,7 @@
 // GLOBAL VARIABLES (State)
 var ctx = null;
 var player;
+var score = 0;
 var canvas;
 //Arrow Keys
 var keysDown = { 37: false, 38: false, 39: false, 40: false }
@@ -49,7 +50,7 @@ var tileTypes = {
 
 //SPRITES
 class Sprite {
-    constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction) {
+    constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction, key) {
         this.tileFrom = tileFrom;
         this.tileTo = tileTo;
         this.timeMoved = timeMoved;
@@ -59,6 +60,7 @@ class Sprite {
         this.health = health;
         this.inventory = inventory;
         this.direction = direction;
+        this.key = key;
     }
     //places the sprite on the board
     placeAt(x,y) {
@@ -185,7 +187,7 @@ class Sprite {
 // EVENT HANDLERS (GLOBAL)
 
     //start button function to launch game
-        //call startGame() and start game loop
+    document.getElementById('start').addEventListener('click', startGame)
 
 // FUNCTIONS
 
@@ -198,6 +200,10 @@ function toIndex(x,y) {
 function initialize() {
     //set upstate with start game button and default UI 
     //(empty inventory, full health, 0 score, null key)
+    player.inventory = [],
+    player.health = 3;
+    player.key = false;
+    score = 0;
 
 };
 
@@ -205,6 +211,7 @@ function startGame() {
     //this should be a separate startGame function
     //starts the loop
     ctx = document.getElementById('game').getContext("2d");
+
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
 
@@ -219,6 +226,15 @@ function startGame() {
             keysDown[evt.keyCode] = false;
         }
     })
+}
+
+function resetLevel() {
+
+}
+
+function restartGame() {
+    initialize();
+    startGame();
 }
 
 //inventory function
