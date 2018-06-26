@@ -1,6 +1,7 @@
 // GLOBAL VARIABLES (State)
 var ctx = null;
 var player;
+var canvas;
 //Arrow Keys
 var keysDown = { 37: false, 38: false, 39: false, 40: false }
 //counts frames to make sure the loop is working
@@ -184,7 +185,7 @@ class Sprite {
 // EVENT HANDLERS (GLOBAL)
 
     //start button function to launch game
-        //call initialize and start game loop
+        //call startGame() and start game loop
 
 // FUNCTIONS
 
@@ -195,6 +196,13 @@ function toIndex(x,y) {
 
 //Initialize function
 function initialize() {
+    //set upstate with start game button and default UI 
+    //(empty inventory, full health, 0 score, null key)
+
+};
+
+function startGame() {
+    //this should be a separate startGame function
     //starts the loop
     ctx = document.getElementById('game').getContext("2d");
     requestAnimationFrame(drawGame);
@@ -211,8 +219,7 @@ function initialize() {
             keysDown[evt.keyCode] = false;
         }
     })
-
-};
+}
 
 //inventory function
     //if player character position === item position
@@ -288,4 +295,5 @@ function drawGame() {
     // if (!winner) requestAnimationFrame(drawGame);
 };
 
+startGame();
 initialize();
