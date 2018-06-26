@@ -186,8 +186,12 @@ class Sprite {
     
 // EVENT HANDLERS (GLOBAL)
 
-    //start button function to launch game
-    document.getElementById('start').addEventListener('click', startGame)
+//start button
+document.getElementById('start').addEventListener('click', startGame)
+
+//restart button
+document.getElementById('restart').addEventListener('click', restartGame)
+
 
 // FUNCTIONS
 
@@ -229,7 +233,8 @@ function startGame() {
 }
 
 function resetLevel() {
-
+//reset score, health, loot, enemies, and inventory to the way 
+//they were when the level started
 }
 
 function restartGame() {
