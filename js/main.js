@@ -95,101 +95,108 @@ class Sprite {
                     var diff =  (tileHeight / this.speed) * (t-this.timeMoved);
                     this.position[1]+= (this.tileTo[1] < this.tileFrom[1] ? 0 - diff : diff);
                 }
-                //smoothing movement
-                this.position[0] = Math.round(this.position[0]);
-                this.position[1] = Math.round(this.position[1]);
-            }
-            return true;
+            //smoothing movement
+            this.position[0] = Math.round(this.position[0]);
+            this.position[1] = Math.round(this.position[1]);
         }
-        //is this space open
-        canMoveTo(x, y) {
-            //if out of bounds
-            if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
-                return false;
-            }
-            //if ocupied by an enemy
-            
-            //if not a path tile
-            if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.path) {
-                if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.unlockedDoor) {
-                    return false;
-                } else {
-                    //run winfunction
-                    winGame();
-                    return true;
-                }
-            }
-            if ()
-            return true;
-        };
-        //moves the character to an available space in the corresponding direction
-        canMoveUp() {
-            return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]-1);
-        };
-        canMoveDown() {
-            return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]+1);
-        };
-        canMoveLeft() {
-            return this.canMoveTo(this.tileFrom[0]-1, this.tileFrom[1]);
-        };
-        canMoveRight() {
-            return this.canMoveTo(this.tileFrom[0]+1, this.tileFrom[1]);
-        };
-        //improve timing on movement when a destination is set
-        moveUp(t){
-            this.tileTo[1] -= 1; this.timeMoved = t;
-        };
-        moveDown(t){
-            this.tileTo[1] += 1; this.timeMoved = t;
-        };
-        moveLeft(t){
-            this.tileTo[0] -= 1; this.timeMoved = t;
-        };
-        moveRight(t){
-            this.tileTo[0] += 1; this.timeMoved = t;
-        };
+        return true;
+    }
+    //is this space open
+    canMoveTo(x, y) {
+        //if out of bounds
+        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
+            return false;
+        }
+        //if ocupied by an enemy
         
+        //if not a path tile
+        if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.path) {
+            if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.unlockedDoor) {
+                return false;
+            } else {
+                //run winfunction
+                winGame();
+                return true;
+            }
+        }
+        if ()
+        return true;
+    };
+    //moves the character to an available space in the corresponding direction
+    canMoveUp() {
+        return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]-1);
+    };
+    canMoveDown() {
+        return this.canMoveTo(this.tileFrom[0], this.tileFrom[1]+1);
+    };
+    canMoveLeft() {
+        return this.canMoveTo(this.tileFrom[0]-1, this.tileFrom[1]);
+    };
+    canMoveRight() {
+        return this.canMoveTo(this.tileFrom[0]+1, this.tileFrom[1]);
+    };
+    //improve timing on movement when a destination is set
+    moveUp(t){
+        this.tileTo[1] -= 1; this.timeMoved = t;
+    };
+    moveDown(t){
+        this.tileTo[1] += 1; this.timeMoved = t;
+    };
+    moveLeft(t){
+        this.tileTo[0] -= 1; this.timeMoved = t;
+    };
+    moveRight(t){
+        this.tileTo[0] += 1; this.timeMoved = t;
     };
     
-    // player
-    player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
+};
     
-    // enemies
-    var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
-    var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
-    var e3 = new Sprite([1,3], [1,3], 0, [20, 20], [545, 455], 600);
-    var e4 = new Sprite([1,3], [1,3], 0, [20, 20], [155, 355], 600);
-    var e5 = new Sprite([1,3], [1,3], 0, [20, 20], [65, 545], 600);
-    var e6 = new Sprite([1,3], [1,3], 0, [20, 20], [305, 95], 600);
+// player
+player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
 
-    //create an array of enemy objects to be looped through later
-    var enemies = [e1, e2];
+// enemies
+var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
+var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
+var e3 = new Sprite([1,3], [1,3], 0, [20, 20], [545, 455], 600);
+var e4 = new Sprite([1,3], [1,3], 0, [20, 20], [155, 355], 600);
+var e5 = new Sprite([1,3], [1,3], 0, [20, 20], [65, 545], 600);
+var e6 = new Sprite([1,3], [1,3], 0, [20, 20], [305, 95], 600);
 
-    //each enemy needs a unique starting position and a movement method
+//create an array of enemy objects to be looped through later
+var enemies = [e1, e2];
 
-    //LOOT CLASS
-    class Loot {
-        constructor(dimensions, position, type, inInventory) {
-            this.dimensions = dimensions;
-            this.position = position;
-            this.type = type;
-            this.inInventory = false;
-        }
+//each enemy needs a unique starting position and a movement method
+
+//LOOT CLASS
+class Loot {
+    constructor(dimensions, position, type, inInventory) {
+        this.dimensions = dimensions;
+        this.position = position;
+        this.type = type;
+        this.inInventory = false;
     }
+}
 
-    var lootType = {
-        1: {label: "apple", purpose: "heal", color: "green"},
-        2: {label: "gold", purpose: "score increase", color: "yellow"}
-    }
+var lootType = {
+    1: {label: "apple", purpose: "heal", color: "green"},
+    2: {label: "gold", purpose: "score increase", color: "yellow"}
+}
 
 
-    //inventory
-    var inventoryArr = [
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0
-    ];
+//inventory
+var inventoryArr = [];
+
+class Level {
+    this.gameMap = gameMap;
+    this.enemies = enemies;
+    this.loot = loot;
+    this.startScore = startScore;
+    this.startHealth = startHealth;
+}
+
+var levelOne = new Level {
+    
+}
     
 /* EVENT HANDLERS (GLOBAL) */
 
