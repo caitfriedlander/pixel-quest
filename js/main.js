@@ -15,6 +15,21 @@ var mapWidth = 20, mapHeight = 20;
 
 /* Cached Elements */
 var canvas = document.querySelector('canvas');
+//make an object with the properties of loaded and url
+var tileset = null; 
+var tilesetURLs = ["images/door1.png", "images/floor1.png", "images/floor2.png", "images/floor3.png", 
+"images/floor4.png", "images/floor5.png", "images/floor6.png", "images/floor7.png", "images/floor8.png", 
+"images/floor9.png", "images/wall1.png", "images/wall2.png", "images/wall3.png", "images/wall4.png", 
+"images/wall5.png", "images/wall6.png", "images/wall7.png", "images/wall8.png"];
+var tilesetLoaded = false;
+
+var charImgs = null;
+var carImgURLs = ["images/witch1.png", "images/witch2.png", "images/witch3.png", 
+"images/witch4.png", "images/witch5.png", "images/witch.6png", 
+"images/witch7.png", "images/witch8.png", "images/witch9.png", 
+"images/witch10.png", "images/witch11.png", "images/witch12.png" ]
+var charImgsLoaded = false;
+
 
 //GAME MAP
 var gameMap = [
@@ -37,17 +52,24 @@ var gameMap = [
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 	0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0,
 	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0
 ];
 
 var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3 }
 
 var tileTypes = {
     0: {color: "#9bcfc2", floor: floorTypes.solid},
-    1: {color: "#ADD8E6", floor: floorTypes.path},
-    2: {color: "#c2cf9b", floor: floorTypes.solid},
-    3: {color: "#c2cf9b", floor: floorTypes.lockedDoor},
-    4: {color: "#c2cfcf", floor: floorTypes.unlockedDoor}
+    1: {color: "#ADD8E6", floor: floorTypes.path, sprite: [tilesetURLs[4]]},
+    2: {color: "#c2cf9b", floor: floorTypes.solid, sprite: [tilesetURLs[0]]},
+    3: {color: "#c2cf9b", floor: floorTypes.lockedDoor, sprite: [tilesetURLs[10]]},
+    4: {color: "#c2cfcf", floor: floorTypes.unlockedDoor, sprite: [tilesetURLs[0]]}
+}
+
+var directions = {
+    up: 0,
+    right: 1,
+    down: 2,
+    left: 3
 }
 
 //SPRITES
@@ -136,6 +158,7 @@ class Sprite {
     //improve timing on movement when a destination is set
     moveUp(t){
         this.tileTo[1] -= 1; this.timeMoved = t;
+        console.log(this.position);
     };
     moveDown(t){
         this.tileTo[1] += 1; this.timeMoved = t;
@@ -150,7 +173,8 @@ class Sprite {
 };
     
 // player
-player = new Sprite([1,1], [1,1], 0, [20, 20], [545,545], 400, 3);
+player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
+player.direction = directions.up;
 
 // enemies
 var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
@@ -213,6 +237,7 @@ function initialize() {
     player.health = 3;
     player.key = false;
     score = 0;
+    player.position = player.position;
 
 };
 
@@ -273,6 +298,12 @@ function gainHealth() {
 function winGame() {
     //launch win message
     console.log('you win!');
+    ctx.fillStyle = 'pink';
+    ctx.fillRect(0, 0, 600, 600)
+    gameMap =[];
+    player.position = [];
+    enemies = [];
+
 }
 
 //lose logic
