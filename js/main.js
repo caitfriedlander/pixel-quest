@@ -270,11 +270,9 @@ function initialize() {
     player.key = false;
     score = 0;
     player.position = player.position;
-
 };
 
 function startGame() {
-    //this should be a separate startGame function
     //starts the loop
     ctx = document.getElementById('game').getContext("2d");
     // I need to refactor the code so that tile width and height 
@@ -346,6 +344,9 @@ function restartGame() {
 
 function loseHeatlth() {
     player.health -= 1;
+    if (player.health == 0) {
+        loseGame()
+    }
 }
 
 function gainHealth() {
@@ -358,6 +359,10 @@ function gainHealth() {
 //win logic
 function winGame() {
     //launch win message
+    ctx = null;
+    ctx = document.getElementById('game').getContext("2d");
+    document.getElementById('game').style.width= '600px';
+    document.getElementById('game').style.height= '600px';
     console.log('you win!');
     ctx.fillStyle = 'pink';
     ctx.fillRect(0, 0, 600, 600)
@@ -370,6 +375,16 @@ function winGame() {
 
 //lose logic
 function loseGame() {
+    ctx = null;
+    ctx = document.getElementById('game').getContext("2d");
+    document.getElementById('game').style.width= '600px';
+    document.getElementById('game').style.height= '600px';
+    console.log('you lose!');
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, 600, 600)
+    gameMap =[];
+    player.position = [];
+    enemies = [];
 }
 
 //main function
