@@ -2,6 +2,7 @@
 var ctx = null;
 var player;
 var score = 0;
+var winner = false;
 //Arrow Keys
 var keysDown = { 37: false, 38: false, 39: false, 40: false }
 //counts frames to make sure the loop is working
@@ -15,54 +16,49 @@ var mapWidth = 20, mapHeight = 20;
 
 /* Cached Elements */
 var canvas = document.querySelector('canvas');
-//make an object with the properties of loaded and url
 var tileset = null; 
-var tilesetURLs = ["images/door1.png", "images/floor1.png", "images/floor2.png", "images/floor3.png", 
-"images/floor4.png", "images/floor5.png", "images/floor6.png", "images/floor7.png", "images/floor8.png", 
-"images/floor9.png", "images/wall1.png", "images/wall2.png", "images/wall3.png", "images/wall4.png", 
-"images/wall5.png", "images/wall6.png", "images/wall7.png", "images/wall8.png"];
+var tilesetURL = "images/pixel-quest-imgs-small.png";
 var tilesetLoaded = false;
-
-var charImgs = null;
-var carImgURLs = ["images/witch1.png", "images/witch2.png", "images/witch3.png", 
-"images/witch4.png", "images/witch5.png", "images/witch.6png", 
-"images/witch7.png", "images/witch8.png", "images/witch9.png", 
-"images/witch10.png", "images/witch11.png", "images/witch12.png" ]
-var charImgsLoaded = false;
-
 
 //GAME MAP
 var gameMap = [
-    0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
-	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-	0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0,
-	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-	0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
-    0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
-    0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0,
-	0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0,
-	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0,
-	0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-	0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-	0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0,
-	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0
+    1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+	1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1,
+	1, 2, 1, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 1,
+	1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+	1, 2, 1, 2, 1, 0, 1, 3, 3, 2, 2, 1, 0, 1, 2, 2, 1, 0, 0, 1,
+	1, 2, 1, 0, 0, 2, 0, 0, 2, 1, 0, 1, 2, 1, 0, 0, 1, 2, 2, 1,
+	1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+	1, 2, 1, 0, 1, 0, 1, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0, 1, 2, 1,
+	1, 2, 1, 2, 1, 2, 1, 0, 0, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 1,
+    1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 2, 1, 2, 2, 2, 1, 2, 1,
+    1, 2, 1, 2, 2, 2, 2, 2, 1, 0, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1,
+	1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 1,
+	1, 3, 1, 0, 1, 2, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1,
+	1, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 1, 3, 1,
+	1, 2, 1, 2, 1, 0, 1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 2, 1,
+	1, 2, 1, 2, 1, 2, 1, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+	1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+	1, 2, 1, 0, 1, 0, 0, 2, 0, 0, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1,
+	1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 2, 2, 2, 1, 2, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 1
 ];
 
 var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3 }
 
 var tileTypes = {
-    0: {color: "#9bcfc2", floor: floorTypes.solid},
-    1: {color: "#ADD8E6", floor: floorTypes.path, sprite: [tilesetURLs[4]]},
-    2: {color: "#c2cf9b", floor: floorTypes.solid, sprite: [tilesetURLs[0]]},
-    3: {color: "#c2cf9b", floor: floorTypes.lockedDoor, sprite: [tilesetURLs[10]]},
-    4: {color: "#c2cfcf", floor: floorTypes.unlockedDoor, sprite: [tilesetURLs[0]]}
+    //horizontal walls
+    0: {color: "#9bcfc2", floor: floorTypes.solid, img: [{x:64, y:128, w:64, h:64}]},
+    //vertical walls
+    1: {color: "#9bcfc2", floor: floorTypes.solid, img: [{x:128, y:128, w:64, h:64}]},
+    //regular floor
+    2: {color: "#ADD8E6", floor: floorTypes.path, img: [{x:0, y:0, w:64, h:64}]},
+    //trapped floor
+    3: {color: "#c2cf9b", floor: floorTypes.solid, img: [{x:64, y:0, w:64, h:64}]},
+    //locked door
+    4: {color: "#c2cf9b", floor: floorTypes.lockedDoor, img: [{x:64, y:64, w:64, h:64}]},
+    //unlocked door
+    5: {color: "#c2cfcf", floor: floorTypes.unlockedDoor, img: [{x:0, y:64, w:64, h:64}]}
 }
 
 var directions = {
@@ -74,7 +70,7 @@ var directions = {
 
 //SPRITES
 class Sprite {
-    constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction, key) {
+    constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction, key, imgs) {
         this.tileFrom = tileFrom;
         this.tileTo = tileTo;
         this.timeMoved = timeMoved;
@@ -83,9 +79,12 @@ class Sprite {
         this.speed = speed;
         this.health = health;
         this.inventory = inventory;
-        this.direction = direction;
+        this.direction = directions.down;
         this.key = key;
+        this.imgs =imgs;
     }
+    //image methods
+
     //places the sprite on the board
     placeAt(x,y) {
         this.tileFrom = [x,y];
@@ -157,24 +156,28 @@ class Sprite {
     };
     //improve timing on movement when a destination is set
     moveUp(t){
-        this.tileTo[1] -= 1; this.timeMoved = t;
+        this.tileTo[1] -= 1; this.timeMoved = t; this.direction = directions.up;
         console.log(this.position);
     };
     moveDown(t){
-        this.tileTo[1] += 1; this.timeMoved = t;
+        this.tileTo[1] += 1; this.timeMoved = t; this.direction = directions.down;
     };
     moveLeft(t){
-        this.tileTo[0] -= 1; this.timeMoved = t;
+        this.tileTo[0] -= 1; this.timeMoved = t; this.direction = directions.left;
     };
     moveRight(t){
-        this.tileTo[0] += 1; this.timeMoved = t;
+        this.tileTo[0] += 1; this.timeMoved = t; this.direction = directions.right;
     };
     
 };
     
 // player
 player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
-player.direction = directions.up;
+player.imgs = {}
+player.imgs[directions.up] = [{x:240, y:145, w:49, h:49}];
+player.imgs[directions.right] = [{x:240, y:96, w:49, h:49}];
+player.imgs[directions.down] = [{x:191, y:96, w:49, h:49}];
+player.imgs[directions.left] = [{x:191, y:145, w:49, h:49}];
 
 // enemies
 var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
@@ -189,7 +192,18 @@ var enemies = [e1, e2];
 
 //each enemy needs a unique starting position and a movement method
 
-//LOOT CLASS
+//LOOT
+var objectCollision = {
+    none: 0,
+    solid: 1
+}
+var objectTypes = {
+    1: {
+        name: 'gold',
+
+    }
+}
+
 class Loot {
     constructor(dimensions, position, type, inInventory) {
         this.dimensions = dimensions;
@@ -249,6 +263,19 @@ function startGame() {
     //have px after them but that doesn't disrupt the flow of the code
     // document.getElementById('game').style.width= '600px';
     // document.getElementById('game').style.height= '600px';
+
+    tileset = new Image();
+    tileset.onerror = function() {
+        ctx = null;
+        alert("failed to load tileset");
+    };
+
+    tileset.onload = function() {
+       tilesetLoaded = true;
+    }
+
+    tileset.src = tilesetURL;
+
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
 
@@ -300,9 +327,10 @@ function winGame() {
     console.log('you win!');
     ctx.fillStyle = 'pink';
     ctx.fillRect(0, 0, 600, 600)
-    gameMap =[];
-    player.position = [];
-    enemies = [];
+    winner = true;
+    // gameMap =[];
+    // player.position = [];
+    // enemies = [];
 
 }
 
@@ -313,6 +341,10 @@ function loseGame() {
 //main function
 function drawGame() {
     if(ctx === null) {
+        return;
+    }
+    if (!tilesetLoaded) {
+        requestAnimationFrame(drawGame); 
         return;
     }
 
@@ -332,12 +364,17 @@ function drawGame() {
     }
         
     //Render board
-    for (var y = 0; y < mapHeight; y++) {
-        for (var x = 0; x < mapWidth; x++) {
-        ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].color;
-        ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
+    if (winner !== true) {    
+        for (var y = 0; y < mapHeight; y++) {
+            for (var x = 0; x < mapWidth; x++) {
+            // ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].color;
+            // ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
+            var tile = tileTypes[gameMap[toIndex(x,y)]];
+            ctx.drawImage(tileset, tile.img[0].x, tile.img[0].y, 
+                tile.img[0].w, tile.img[0].h);
         }
     }
+}
 
     //check to see if player is moving
     if (!player.processMovement(currentFrameTime)) {
@@ -353,9 +390,13 @@ function drawGame() {
     }
 
     //render player
-    ctx.fillStyle = "#cf9bc2";
-    ctx.fillRect(player.position[0], player.position[1], 
-        player.dimensions[0], player.dimensions[1]);
+    // ctx.fillStyle = "#cf9bc2";
+    // ctx.fillRect(player.position[0], player.position[1], 
+    //     player.dimensions[0], player.dimensions[1]);
+    var playerImg = player.imgs[player.direction];
+    ctx.drawImage(tileset, playerImg[0].x, playerImg[0].y, playerImg[0].w, playerImg[0].h,
+		player.position[0], player.position[1], player.dimensions[0], player.dimensions[1]);
+    
     
     //render enemies
 
@@ -368,8 +409,8 @@ function drawGame() {
         ctx.fillStyle = "#ff0000";
         // ctx.fillText(framesLastSecond, 10, 20);
         lastFrameTime = currentFrameTime;
-        requestAnimationFrame(drawGame);
-        // if (!winner) requestAnimationFrame(drawGame);
+        // requestAnimationFrame(drawGame);
+        if (!winner) requestAnimationFrame(drawGame);
     };
  
 
