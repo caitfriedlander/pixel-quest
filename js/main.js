@@ -18,7 +18,7 @@ var canvas = document.querySelector('canvas');
 
 //GAME MAP
 var gameMap = [
-    0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
 	0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
@@ -37,7 +37,7 @@ var gameMap = [
 	0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 	0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0,
 	0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0
 ];
 
 var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3 }
@@ -150,7 +150,7 @@ class Sprite {
 };
     
 // player
-player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
+player = new Sprite([1,1], [1,1], 0, [20, 20], [545,545], 400, 3);
 
 // enemies
 var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
@@ -220,8 +220,10 @@ function startGame() {
     //this should be a separate startGame function
     //starts the loop
     ctx = document.getElementById('game').getContext("2d");
-    canvas.style.width = '600px';
-    canvas.style.height = '600px';
+    // I need to refactor the code so that tile width and height 
+    //have px after them but that doesn't disrupt the flow of the code
+    // document.getElementById('game').style.width= '600px';
+    // document.getElementById('game').style.height= '600px';
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
 
