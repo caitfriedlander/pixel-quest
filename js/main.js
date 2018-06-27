@@ -48,7 +48,7 @@ var tileEvents = {
 
 }
 
-var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3 }
+var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4 }
 
 var tileTypes = {
     //horizontal walls
@@ -58,7 +58,7 @@ var tileTypes = {
     //regular floor
     2: {color: "#ADD8E6", floor: floorTypes.path, img: [{x:0, y:0, w:64, h:64}]},
     //trapped floor
-    3: {color: "#c2cf9b", floor: floorTypes.path, img: [{x:64, y:0, w:64, h:64, d:600}, {x:128, y:0, w:64, h:64, d:600}]},
+    3: {color: "#c2cf9b", floor: floorTypes.path, img: [{x:64, y:0, w:64, h:64, d:1200}, {x:128, y:0, w:64, h:64, d:1200}]},
     //locked door
     4: {color: "#c2cf9b", floor: floorTypes.lockedDoor, img: [{x:64, y:64, w:64, h:64}]},
     //unlocked door
@@ -246,6 +246,21 @@ function toIndex(x,y) {
     return ((y * mapWidth) + x);
 }
 
+//Animated Sprite function
+function getFrame(img, durration, time, animated) {
+
+    if(!animated) {
+        return img[0];
+    }
+    time = time % durration;
+    for (x in img) {
+        if (img[x].end >= time) {
+            return img[x];
+        }
+    }
+
+};
+
 //Initialize function
 function initialize() {
     //set upstate with start game button and default UI 
@@ -278,6 +293,22 @@ function startGame() {
     }
 
     tileset.src = tilesetURL;
+
+    for(x in tileTypes) {
+        tileTypes[x]['animated'] = tileTypes[x].img.length > 1 ? true : false;
+
+        if(tileTypes[x].animated) {
+            var t = 0;
+
+            for(i in tileTypes[x].img) {
+                tileTypes[x].img[i]['start'] = t;
+
+                t+= tileTypes[x].img[i].d;
+                tileTypes[x].img[i]['end'] = t;
+            }
+            tileTypes[x]['durration'] = t;
+        }
+    };
 
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
@@ -352,7 +383,7 @@ function drawGame() {
     }
 
     var currentFrameTime = Date.now();
-    var timeElapsed = currentFrameTime - lastFrameTime;
+    // var timeElapsed = currentFrameTime - lastFrameTime;
 
     //frame counter
     var sec = Math.floor(Date.now()/1000);
@@ -370,13 +401,18 @@ function drawGame() {
     if (winner !== true) {    
         for (var y = 0; y < mapHeight; y++) {
             for (var x = 0; x < mapWidth; x++) {
+            //paint squares
             // ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].color;
             // ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
             var tile = tileTypes[gameMap[toIndex(x,y)]];
-            ctx.drawImage(tileset, tile.img[0].x, tile.img[0].y, 
-                tile.img[0].w, tile.img[0].h, (x*tileWidth), (y*tileHeight),
-				tileWidth, tileHeight);
-            }
+            //render single images
+            // ctx.drawImage(tileset, tile.img[0].x, tile.img[0].y, 
+            //     tile.img[0].w, tile.img[0].h, (x*tileWidth), (y*tileHeight),
+			// 	tileWidth, tileHeight);
+            // }
+            var img = getFrame(tile.img, tile.durration, currentFrameTime, tile.animated);
+            ctx.drawImage(tileset, img.x, img.y, img.w, img.h, (x*tileWidth), (y*tileHeight), 
+            tileWidth, tileHeight);
         }
     }
 
@@ -414,7 +450,7 @@ function drawGame() {
         // requestAnimationFrame(drawGame);
         if (!winner) requestAnimationFrame(drawGame);
     };
- 
+}
 
 startGame();
 initialize();
