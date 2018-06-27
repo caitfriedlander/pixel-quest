@@ -16,7 +16,6 @@ var mapWidth = 20, mapHeight = 20;
 /* Cached Elements */
 var canvas = document.querySelector('canvas');
 
-
 //GAME MAP
 var gameMap = [
     0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -119,7 +118,6 @@ class Sprite {
                 return true;
             }
         }
-        if ()
         return true;
     };
     //moves the character to an available space in the corresponding direction
@@ -184,19 +182,12 @@ var lootType = {
 
 
 //inventory
-var inventoryArr = [];
-
-class Level {
-    this.gameMap = gameMap;
-    this.enemies = enemies;
-    this.loot = loot;
-    this.startScore = startScore;
-    this.startHealth = startHealth;
-}
-
-var levelOne = new Level {
-    
-}
+var inventoryArr = [
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0
+];
     
 /* EVENT HANDLERS (GLOBAL) */
 
@@ -283,6 +274,8 @@ function winGame() {
 }
 
 //lose logic
+function loseGame() {
+}
 
 //main function
 function drawGame() {
