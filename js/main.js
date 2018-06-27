@@ -44,6 +44,10 @@ var gameMap = [
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 1
 ];
 
+var tileEvents = {
+
+}
+
 var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3 }
 
 var tileTypes = {
@@ -157,7 +161,6 @@ class Sprite {
     //improve timing on movement when a destination is set
     moveUp(t){
         this.tileTo[1] -= 1; this.timeMoved = t; this.direction = directions.up;
-        console.log(this.position);
     };
     moveDown(t){
         this.tileTo[1] += 1; this.timeMoved = t; this.direction = directions.down;
@@ -371,10 +374,11 @@ function drawGame() {
             // ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
             var tile = tileTypes[gameMap[toIndex(x,y)]];
             ctx.drawImage(tileset, tile.img[0].x, tile.img[0].y, 
-                tile.img[0].w, tile.img[0].h);
+                tile.img[0].w, tile.img[0].h, (x*tileWidth), (y*tileHeight),
+				tileWidth, tileHeight);
+            }
         }
     }
-}
 
     //check to see if player is moving
     if (!player.processMovement(currentFrameTime)) {
@@ -396,8 +400,6 @@ function drawGame() {
     var playerImg = player.imgs[player.direction];
     ctx.drawImage(tileset, playerImg[0].x, playerImg[0].y, playerImg[0].w, playerImg[0].h,
 		player.position[0], player.position[1], player.dimensions[0], player.dimensions[1]);
-    
-    
     //render enemies
 
     enemies.forEach(function(e) {
