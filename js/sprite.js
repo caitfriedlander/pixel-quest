@@ -1,3 +1,5 @@
+//SPRITES
+//move to seprate file sprite.js
 class Sprite {
     constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction, key, imgs) {
         this.tileFrom = tileFrom;
