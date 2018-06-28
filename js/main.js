@@ -24,7 +24,7 @@ var tilesetLoaded = false;
 
 //GAME MAP
 var gameMap = [
-    1, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+    1, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
 	1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 6, 1,
 	1, 2, 1, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1,
 	1, 2, 1, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
@@ -52,23 +52,26 @@ var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4, k
 
 var tileTypes = {
     //horizontal walls
-    0: {color: "#9bcfc2", floor: floorTypes.solid, img: [{x:64, y:128, w:64, h:64}]},
+    0: {floor: floorTypes.solid, img: [{x:64, y:128, w:64, h:64}]},
     //vertical walls
-    1: {color: "#9bcfc2", floor: floorTypes.solid, img: [{x:128, y:128, w:64, h:64}]},
+    1: {floor: floorTypes.solid, img: [{x:128, y:128, w:64, h:64}]},
     //regular floor
-    2: {color: "#ADD8E6", floor: floorTypes.path, img: [{x:0, y:0, w:64, h:64}]},
+    2: {floor: floorTypes.path, img: [{x:0, y:0, w:64, h:64}]},
     //trapped floor
-    3: {color: "#c2cf9b", floor: floorTypes.trap, img: [{x:64, y:0, w:64, h:64, d:1200}, {x:128, y:0, w:64, h:64, d:1200}]},
+    3: {floor: floorTypes.trap, img: [{x:64, y:0, w:64, h:64, d:1500}, 
+        {x:128, y:0, w:64, h:64, d:1500}]},
     //locked door
-    4: {color: "#c2cf9b", floor: floorTypes.lockedDoor, img: [{x:64, y:64, w:64, h:64}]},
+    4: {floor: floorTypes.lockedDoor, img: [{x:64, y:64, w:64, h:64}]},
     //unlocked door
-    5: {color: "#c2cfcf", floor: floorTypes.unlockedDoor, img: [{x:0, y:64, w:64, h:64}]},
+    5: {floor: floorTypes.unlockedDoor, img: [{x:0, y:64, w:64, h:64}]},
     //key
-    6: {color: "#c2cfcf", floor: floorTypes.key, img: [{x:128, y:64, w:64, h:64}]},
+    6: {floor: floorTypes.key, img: [{x:128, y:64, w:64, h:64}]},
     //potion
-    7: {color: "#c2cfcf", floor: floorTypes.loot, img: [{x:128, y:64, w:64, h:64}]},
+    7: {floor: floorTypes.loot, img: [{x:128, y:64, w:64, h:64}]},
     //gold
-    6: {color: "#c2cfcf", floor: floorTypes.loot, img: [{x:128, y:64, w:64, h:64}]}
+    6: {floor: floorTypes.loot, img: [{x:128, y:64, w:64, h:64}]},
+    //door
+    7: {floor: floorTypes.solid, img: [{x:64, y:64, w:64, h:64}]}
 }
 
 var directions = {
@@ -93,8 +96,6 @@ class Sprite {
         this.key = key;
         this.imgs =imgs;
     }
-    //image methods
-    
     //places the sprite on the board
     placeAt(x,y) {
         this.tileFrom = [x,y];
@@ -139,7 +140,14 @@ class Sprite {
         if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
             return false;
         }
+        if(mapTileData.map[toIndex(x,y)].object!=null){
+            var o = mapTileData.map[toIndex(x,y)].object;
+            if(objectTypes[o.type].collision==objectCollision.solid){
+                return false;
+            }
+        }
         //if ocupied by an enemy
+            //collision detection here
         
         //if not a path tile
         var pos = tileTypes[gameMap[toIndex(x,y)]].floor;
@@ -215,31 +223,61 @@ player.imgs[directions.right] = [{x:240, y:96, w:49, h:49}];
 player.imgs[directions.down] = [{x:191, y:96, w:49, h:49}];
 player.imgs[directions.left] = [{x:191, y:145, w:49, h:49}];
 
-// enemies
+// enemies //animation not working
 var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
 e1.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-    var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
-    e2.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-        {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
+{x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
+var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
+e2.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+{x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
         
-        //create an array of enemy objects to be looped through later
-        var enemies = [e1, e2];
-        
-        //each enemy needs a unique starting position and a movement method
-        
-        //LOOT
-        var objectCollision = {
-            none: 0,
-            solid: 1
-        }
-        var objectTypes = {
-            1: {
-                name: 'gold',
-                
-            }
+//create an array of enemy objects to be looped through later
+var enemies = [e1, e2];
+
+//LOOT
+var objectCollision = {
+    none: 0,
+    solid: 1
 }
 
+var objectTypes = {
+    1: {
+        name: 'gold',
+        img: [{x:191, y:145, w:49, h:49}],
+        collision: objectCollision.none  
+    },
+    2: {
+        name: 'potion',
+        img: [{x:191, y:145, w:49, h:49}],
+        collision: objectCollision.none  
+    },
+    3: {
+        name: 'key',
+        img: [{x:191, y:145, w:49, h:49}],
+        collision: objectCollision.none  
+    }
+}
+
+function MapObject(type){
+	this.x		= 0;
+	this.y		= 0;
+    this.type	= type;
+    this.object = object;
+}
+
+MapObject.prototype.placeAt = function(newX, newY){
+	if(mapTileData.map[toIndex(this.x, this.y)].object==this)
+	{
+		mapTileData.map[toIndex(this.x, this.y)].object = null;
+	}
+	this.x = newX;
+	this.y = newY;
+	mapTileData.map[toIndex(newX, newY)].object = this;
+};
+
+//this isn't working
+// var mo1 = new MapObject(1); mo1.placeAt(2, 4);
+// var mo2 = new MapObject(2); mo2.placeAt(2, 3);
 
 //inventory
 var inventoryArr = [
@@ -267,9 +305,10 @@ function toIndex(x,y) {
 
 function Tile(tx, ty, tt)
 {
-    this.x			= tx;
-    this.y			= ty;
-    this.type		= tt;
+    this.x = tx;
+    this.y = ty;
+    this.type = tt;
+    this.object = null;
 }
 
 function TileMap()
@@ -307,9 +346,11 @@ function playerFinder(player) {
 //unlock door function
 
 function unlockDoor() {
+    //not working
     player.key = true;
-    gameMap[18,19] = 5;
-    console.log(gameMap[18,19]);
+    tileTypes[4].floor = 3;
+    tileTypes[4].img = [{x:0, y:64, w:64, h:64}];
+    console.log("I'm unlocked!");
 }
 
 
