@@ -218,18 +218,6 @@ e1.imgs = [{x:273, y:0, w:43, h:24, d:200},
 var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
 e2.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-// var e3 = new Sprite([1,3], [1,3], 0, [20, 20], [545, 455], 600);
-// e3.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-// var e4 = new Sprite([1,3], [1,3], 0, [20, 20], [155, 355], 600);
-// e4.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-// var e5 = new Sprite([1,3], [1,3], 0, [20, 20], [65, 545], 600);
-// e5.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-// var e6 = new Sprite([1,3], [1,3], 0, [20, 20], [305, 95], 600);
-// e6.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 
 //create an array of enemy objects to be looped through later
 var enemies = [e1, e2];
@@ -318,10 +306,10 @@ function startGame() {
     //starts the loop
     running = true;
     ctx = document.getElementById('game').getContext("2d");
-    // I need to refactor the code so that tile width and height 
-    //have px after them but that doesn't disrupt the flow of the code
-    // document.getElementById('game').style.width= '600px';
-    // document.getElementById('game').style.height= '600px';
+/*  I need to refactor the code so that tile width and height 
+    have px after them but that doesn't disrupt the flow of the code
+    document.getElementById('game').style.width= '600px';
+    document.getElementById('game').style.height= '600px'; */
 
     tileset = new Image();
     tileset.onerror = function() {
