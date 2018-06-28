@@ -23,7 +23,7 @@ var tilesetLoaded = false;
 //GAME MAP
 var gameMap = [
     1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-	1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1,
+	1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 6, 1,
 	1, 2, 1, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1,
 	1, 2, 1, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 	1, 2, 1, 2, 1, 0, 1, 2, 3, 2, 2, 1, 0, 1, 2, 2, 1, 0, 3, 1,
@@ -44,9 +44,7 @@ var gameMap = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0
 ];
 
-var tileEvents = {
-
-}
+var tileEvents = { 3 : 'trap', 6: 'key'}
 
 var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4 }
 
@@ -62,7 +60,9 @@ var tileTypes = {
     //locked door
     4: {color: "#c2cf9b", floor: floorTypes.lockedDoor, img: [{x:64, y:64, w:64, h:64}]},
     //unlocked door
-    5: {color: "#c2cfcf", floor: floorTypes.unlockedDoor, img: [{x:0, y:64, w:64, h:64}]}
+    5: {color: "#c2cfcf", floor: floorTypes.unlockedDoor, img: [{x:0, y:64, w:64, h:64}]},
+    //key
+    6: {color: "#c2cfcf", floor: floorTypes.path, img: [{x:128, y:64, w:64, h:64}]}
 }
 
 var directions = {
@@ -184,11 +184,23 @@ player.imgs[directions.left] = [{x:191, y:145, w:49, h:49}];
 
 // enemies
 var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
+e1.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
+e2.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 var e3 = new Sprite([1,3], [1,3], 0, [20, 20], [545, 455], 600);
+e3.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 var e4 = new Sprite([1,3], [1,3], 0, [20, 20], [155, 355], 600);
+e4.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 var e5 = new Sprite([1,3], [1,3], 0, [20, 20], [65, 545], 600);
+e5.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 var e6 = new Sprite([1,3], [1,3], 0, [20, 20], [305, 95], 600);
+e6.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 
 //create an array of enemy objects to be looped through later
 var enemies = [e1, e2];
@@ -245,6 +257,23 @@ document.getElementById('restart').addEventListener('click', restartGame)
 function toIndex(x,y) {
     return ((y * mapWidth) + x);
 }
+
+// //enemy image factory
+// function enemyImgFactory(enemies) {
+//     for(x in enemies) {
+//         enemies[x].imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+//             {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}]
+//     }
+// }
+
+//unlock door function
+
+function unlockDoor() {
+    tileTypes[4].floor = 4;
+    tileTypes[4].img = [{x:0, y:64, w:64, h:64}];
+    console.log(tileTypes[4].floor);
+}
+
 
 //Animated Sprite function
 function getFrame(img, durration, time, animated) {
@@ -451,12 +480,17 @@ function drawGame() {
     var playerImg = player.imgs[player.direction];
     ctx.drawImage(tileset, playerImg[0].x, playerImg[0].y, playerImg[0].w, playerImg[0].h,
 		player.position[0], player.position[1], player.dimensions[0], player.dimensions[1]);
-    //render enemies
+    
+        //render enemies
 
     enemies.forEach(function(e) {
-        ctx.fillStyle = "red";
-        ctx.fillRect(e.position[0], e.position[1], 
-            e.dimensions[0], e.dimensions[1]);
+        // ctx.fillStyle = "red";
+        // ctx.fillRect(e.position[0], e.position[1], 
+        //     e.dimensions[0], e.dimensions[1]);
+        var enemy = e;
+        var enemyImg = enemy.imgs;
+        ctx.drawImage(tileset, enemyImg[0].x, enemyImg[0].y, enemyImg[0].w, enemyImg[0].h,
+		enemy.position[0], enemy.position[1], enemy.dimensions[0], enemy.dimensions[1]);
         });
 
         ctx.fillStyle = "#ff0000";
