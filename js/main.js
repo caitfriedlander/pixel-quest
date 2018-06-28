@@ -3,6 +3,8 @@ var ctx = null;
 var player;
 var score = 0;
 var winner = false;
+var running;
+var playerPos;
 //Arrow Keys
 var keysDown = { 37: false, 38: false, 39: false, 40: false }
 //counts frames to make sure the loop is working
@@ -22,15 +24,15 @@ var tilesetLoaded = false;
 
 //GAME MAP
 var gameMap = [
-    1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+    1, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
 	1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 6, 1,
 	1, 2, 1, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1,
 	1, 2, 1, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-	1, 2, 1, 2, 1, 0, 1, 2, 3, 2, 2, 1, 0, 1, 2, 2, 1, 0, 3, 1,
+	1, 6, 1, 2, 1, 0, 1, 2, 3, 2, 2, 1, 0, 1, 2, 2, 1, 0, 3, 1,
 	1, 2, 0, 0, 0, 2, 0, 0, 2, 1, 0, 0, 2, 0, 0, 0, 0, 2, 2, 1,
 	1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 	1, 2, 1, 0, 1, 0, 1, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0, 1, 2, 1,
-	1, 2, 1, 2, 0, 2, 0, 0, 0, 0, 2, 2, 2, 1, 2, 2, 2, 1, 2, 1,
+	1, 3, 1, 2, 0, 2, 0, 0, 0, 0, 2, 2, 2, 1, 2, 2, 2, 1, 2, 1,
     1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 1, 2, 1,
     1, 2, 1, 2, 2, 2, 2, 2, 1, 0, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1,
 	1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 1,
@@ -44,9 +46,7 @@ var gameMap = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0
 ];
 
-var tileEvents = { 3 : 'trap', 6: 'key'}
-
-var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4 }
+var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4, key: 5, loot: 6 }
 
 var tileTypes = {
     //horizontal walls
@@ -56,13 +56,17 @@ var tileTypes = {
     //regular floor
     2: {color: "#ADD8E6", floor: floorTypes.path, img: [{x:0, y:0, w:64, h:64}]},
     //trapped floor
-    3: {color: "#c2cf9b", floor: floorTypes.path, img: [{x:64, y:0, w:64, h:64, d:1200}, {x:128, y:0, w:64, h:64, d:1200}]},
+    3: {color: "#c2cf9b", floor: floorTypes.trap, img: [{x:64, y:0, w:64, h:64, d:1200}, {x:128, y:0, w:64, h:64, d:1200}]},
     //locked door
     4: {color: "#c2cf9b", floor: floorTypes.lockedDoor, img: [{x:64, y:64, w:64, h:64}]},
     //unlocked door
     5: {color: "#c2cfcf", floor: floorTypes.unlockedDoor, img: [{x:0, y:64, w:64, h:64}]},
     //key
-    6: {color: "#c2cfcf", floor: floorTypes.path, img: [{x:128, y:64, w:64, h:64}]}
+    6: {color: "#c2cfcf", floor: floorTypes.key, img: [{x:128, y:64, w:64, h:64}]},
+    //potion
+    7: {color: "#c2cfcf", floor: floorTypes.loot, img: [{x:128, y:64, w:64, h:64}]},
+    //gold
+    6: {color: "#c2cfcf", floor: floorTypes.loot, img: [{x:128, y:64, w:64, h:64}]}
 }
 
 var directions = {
@@ -134,16 +138,41 @@ class Sprite {
         //if ocupied by an enemy
         
         //if not a path tile
-        if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.path) {
-            if (tileTypes[gameMap[toIndex(x,y)]].floor != floorTypes.unlockedDoor) {
-                return false;
-            } else {
-                //run winfunction
-                winGame();
+        var pos = tileTypes[gameMap[toIndex(x,y)]].floor;
+        console.log(pos);
+        switch (pos) {
+            case (floorTypes.path) :
                 return true;
-            }
+                break;
+            case floorTypes.solid :
+                console.log('nope')
+                return false;
+                break;
+            case (floorTypes.trap) :
+                loseHeatlth();
+                console.log('ow');
+                return true;
+                break;
+            case (floorTypes.key) :
+                //not working because the game is not detecting this floortype
+                //it's registering as a path
+                unlockDoor();
+                console.log('unlocked!')
+                return false;
+                break;
+            case floorTypes.lockedDoor :
+                console.log('locked!')
+                return false;
+                break;
+            case floorTypes.unlockedDoor :
+                console.log("you win!")
+                winGame()
+                return true;
+                break;
+            case floorTypes.loot :
+                return true;
+                break;
         }
-        return true;
     };
     //moves the character to an available space in the corresponding direction
     canMoveUp() {
@@ -189,18 +218,18 @@ e1.imgs = [{x:273, y:0, w:43, h:24, d:200},
 var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
 e2.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-var e3 = new Sprite([1,3], [1,3], 0, [20, 20], [545, 455], 600);
-e3.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-var e4 = new Sprite([1,3], [1,3], 0, [20, 20], [155, 355], 600);
-e4.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-var e5 = new Sprite([1,3], [1,3], 0, [20, 20], [65, 545], 600);
-e5.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-var e6 = new Sprite([1,3], [1,3], 0, [20, 20], [305, 95], 600);
-e6.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
+// var e3 = new Sprite([1,3], [1,3], 0, [20, 20], [545, 455], 600);
+// e3.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
+// var e4 = new Sprite([1,3], [1,3], 0, [20, 20], [155, 355], 600);
+// e4.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
+// var e5 = new Sprite([1,3], [1,3], 0, [20, 20], [65, 545], 600);
+// e5.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
+// var e6 = new Sprite([1,3], [1,3], 0, [20, 20], [305, 95], 600);
+// e6.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+//     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
 
 //create an array of enemy objects to be looped through later
 var enemies = [e1, e2];
@@ -217,20 +246,6 @@ var objectTypes = {
         name: 'gold',
 
     }
-}
-
-class Loot {
-    constructor(dimensions, position, type, inInventory) {
-        this.dimensions = dimensions;
-        this.position = position;
-        this.type = type;
-        this.inInventory = false;
-    }
-}
-
-var lootType = {
-    1: {label: "apple", purpose: "heal", color: "green"},
-    2: {label: "gold", purpose: "score increase", color: "yellow"}
 }
 
 
@@ -258,20 +273,17 @@ function toIndex(x,y) {
     return ((y * mapWidth) + x);
 }
 
-// //enemy image factory
-// function enemyImgFactory(enemies) {
-//     for(x in enemies) {
-//         enemies[x].imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-//             {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}]
-//     }
-// }
+//find exact player position
+function playerFinder(player) {
+    playerPos = toIndex(player.position[0], player.position[1]);
+}
 
 //unlock door function
 
 function unlockDoor() {
-    tileTypes[4].floor = 4;
-    tileTypes[4].img = [{x:0, y:64, w:64, h:64}];
-    console.log(tileTypes[4].floor);
+    player.key = true;
+    gameMap[18,19] = 5;
+    console.log(gameMap[18,19]);
 }
 
 
@@ -299,10 +311,12 @@ function initialize() {
     player.key = false;
     score = 0;
     player.position = player.position;
+    running = false;
 };
 
 function startGame() {
     //starts the loop
+    running = true;
     ctx = document.getElementById('game').getContext("2d");
     // I need to refactor the code so that tile width and height 
     //have px after them but that doesn't disrupt the flow of the code
@@ -353,11 +367,6 @@ function startGame() {
     })
 }
 
-function resetLevel() {
-//reset score, health, loot, enemies, and inventory to the way 
-//they were when the level started
-}
-
 function restartGame() {
     initialize();
     startGame();
@@ -369,7 +378,7 @@ function restartGame() {
             //remove item from board
             //place in inventory
 
-//health function
+//health functions
 
 function loseHeatlth() {
     player.health -= 1;
@@ -396,6 +405,7 @@ function winGame() {
     ctx.fillStyle = 'pink';
     ctx.fillRect(0, 0, 600, 600)
     winner = true;
+    running = false;
     gameMap =[];
     player.position = [];
     enemies = [];
@@ -411,6 +421,7 @@ function loseGame() {
     console.log('you lose!');
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, 600, 600)
+    running = false;
     gameMap =[];
     player.position = [];
     enemies = [];
@@ -445,15 +456,7 @@ function drawGame() {
     if (winner !== true) {    
         for (var y = 0; y < mapHeight; y++) {
             for (var x = 0; x < mapWidth; x++) {
-            //paint squares
-            // ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].color;
-            // ctx.fillRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
             var tile = tileTypes[gameMap[toIndex(x,y)]];
-            //render single images
-            // ctx.drawImage(tileset, tile.img[0].x, tile.img[0].y, 
-            //     tile.img[0].w, tile.img[0].h, (x*tileWidth), (y*tileHeight),
-			// 	tileWidth, tileHeight);
-            // }
             var img = getFrame(tile.img, tile.durration, currentFrameTime, tile.animated);
             ctx.drawImage(tileset, img.x, img.y, img.w, img.h, (x*tileWidth), (y*tileHeight), 
             tileWidth, tileHeight);
@@ -474,9 +477,6 @@ function drawGame() {
     }
 
     //render player
-    // ctx.fillStyle = "#cf9bc2";
-    // ctx.fillRect(player.position[0], player.position[1], 
-    //     player.dimensions[0], player.dimensions[1]);
     var playerImg = player.imgs[player.direction];
     ctx.drawImage(tileset, playerImg[0].x, playerImg[0].y, playerImg[0].w, playerImg[0].h,
 		player.position[0], player.position[1], player.dimensions[0], player.dimensions[1]);
@@ -484,9 +484,6 @@ function drawGame() {
         //render enemies
 
     enemies.forEach(function(e) {
-        // ctx.fillStyle = "red";
-        // ctx.fillRect(e.position[0], e.position[1], 
-        //     e.dimensions[0], e.dimensions[1]);
         var enemy = e;
         var enemyImg = enemy.imgs;
         ctx.drawImage(tileset, enemyImg[0].x, enemyImg[0].y, enemyImg[0].w, enemyImg[0].h,
@@ -497,7 +494,7 @@ function drawGame() {
         // ctx.fillText(framesLastSecond, 10, 20);
         lastFrameTime = currentFrameTime;
         // requestAnimationFrame(drawGame);
-        if (!winner) requestAnimationFrame(drawGame);
+        if (!running) requestAnimationFrame(drawGame);
     };
 }
 
