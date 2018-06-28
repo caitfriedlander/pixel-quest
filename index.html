@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link type="text/css" rel="stylesheet" href="css/style.css">
+    <!-- <script type="text/javascript" src="js/sprite.js"></script> -->
     <script type="text/javascript" src="js/levels.js"></script>
     <title>Pixel Quest</title>
 </head>
@@ -15,21 +16,22 @@
         <h1>Pixel Quest</h1>
     </header>
     <div id="container">
+        <div class="panel" id="start"> Start game?</div>
+        <div class="panel" id="win">You win!</div>
+        <div class="panel" id="lose">You suck!</div>
         <canvas id="game" width="600" height="600"></canvas>
         <aside>
-            <h2>Score</h2>
-            <div id="score">0</div>
+            <h2>Level</h2>
+            <div id="level">1</div>
             <h2>Health</h2>
             <div id="health">3</div>
-            <button id="start">Start Game</button>
-            <button id="restart">Restart Game</button>
+            <button id="button">Start Game</button>
         </aside>
     </div>
     <footer>
         <h3>Instructions:</h3>
-        <p>Navigate the maze using the arrow keys. Pick up the key to unlock the exit and move on to the next level and avoid
-            the enemies!
-            <br> Collect treasure to increase your score and items to replenish health. But be careful: if you run out of lives,
+        <p>Navigate the maze using the arrow keys. Pick up the key to unlock the exit and move on to the next level!
+            <br> Collect the potion to replenish your health. But be careful: if you run out of health,
             you lose!</p>
     </footer>
     <script type="text/javascript" src="js/main.js"></script>

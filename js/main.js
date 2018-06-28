@@ -1,38 +1,6 @@
-/* GLOBAL VARIABLES (State) */
-var ctx = null;
-var player;
-var score = 0;
-var currentLevel = 0;
-var winner = false;
-var running;
-//Arrow Keys
-var keysDown = { 37: false, 38: false, 39: false, 40: false }
-//counts frames to make sure the loop is working
-var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
-//last time a frame was drawn
-var lastFrameTime = 0;
-//tile width/height
-var tileWidth = 30, tileHeight = 30;
-//map width/height
-var mapWidth = 20, mapHeight = 20;
-
-/* Cached Elements */
-var canvas = document.querySelector('canvas');
-var scoreDisplay = document.getElementById('score');
-var healthDispaly = document.getElementById('health');
-var tileset = null;
-var tilesetURL = "images/pixel-quest-imgs-small.png";
-var tilesetLoaded = false;
-
-var levels = [level0, level1, level2];
-
-//GAME MAP
-var gameMap = level2;
-
-var mapTileData = new TileMap();
-
-var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4, doorkey: 5, potion: 6, loot: 7 }
-
+/* CONSTANTS*/
+var keysDown = { 37: false, 38: false, 39: false, 40: false };
+var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4, doorkey: 5, potion: 6 };
 var tileTypes = {
     //horizontal walls
     0: { floor: floorTypes.solid, img: [{ x: 64, y: 128, w: 64, h: 64 }] },
@@ -52,20 +20,40 @@ var tileTypes = {
     6: { floor: floorTypes.doorkey, img: [{ x: 128, y: 64, w: 64, h: 64 }] },
     //potion
     7: { floor: floorTypes.potion, img: [{ x: 294, y: 128, w: 64, h: 64 }] },
-    //gold
-    8: { floor: floorTypes.loot, img: [{ x: 358, y: 128, w: 64, h: 64 }] },
     //door
-    9: { floor: floorTypes.solid, img: [{ x: 64, y: 64, w: 64, h: 64 }] }
-}
+    8: { floor: floorTypes.solid, img: [{ x: 64, y: 64, w: 64, h: 64 }] }
+};
+/* GLOBAL VARIABLES (State) */
+var ctx = null;
+var player;
+var running;
+var panel = 'S';
+var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
+var lastFrameTime = 0;
+var tileWidth = 30, tileHeight = 30;
+var mapWidth = 20, mapHeight = 20;
+var tileset = null;
+var tilesetLoaded = false;
+var levels = [level0, level1, level2];
+var currentLevel = 0;
 
-var directions = {
-    up: 0,
-    right: 1,
-    down: 2,
-    left: 3
-}
+/* Cached Elements */
+var button = document.getElementById('button');
+var canvas = document.querySelector('canvas');
+var levelDisplay = document.getElementById('level');
+var healthDisplay = document.getElementById('health');
+var tilesetURL = "images/pixel-quest-imgs-small.png";
+var startEl = document.getElementById('start');
+var winEl = document.getElementById('win');
+var loseEl = document.getElementById('lose');
+
+//GAME MAP
+var gameMap = levels[currentLevel];
+
+var mapTileData = new TileMap();
 
 //SPRITES
+//move to seprate file sprite.js
 class Sprite {
     constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction, key, imgs) {
         this.tileFrom = tileFrom;
@@ -130,9 +118,6 @@ class Sprite {
                 return false;
             }
         }
-        //if ocupied by an enemy
-        //collision detection here
-
         //if not a path tile
         var pos = tileTypes[gameMap[toIndex(x, y)]].floor;
         switch (pos) {
@@ -165,10 +150,6 @@ class Sprite {
             case floorTypes.potion:
                 takePotion()
                 console.log('health')
-                return true;
-                break;
-            case floorTypes.loot:
-                lootItem();
                 return true;
                 break;
             case undefined:
@@ -205,9 +186,16 @@ class Sprite {
         this.tileTo[0] += 1; this.timeMoved = t; this.direction = directions.right;
     };
 
+}
+
+var directions = {
+    up: 0,
+    right: 1,
+    down: 2,
+    left: 3
 };
 
-// player
+// PLAYER
 player = new Sprite([1, 1], [1, 1], 0, [20, 20], [35, 35], 400, 3);
 player.imgs = {}
 player.imgs[directions.up] = [{ x: 240, y: 145, w: 49, h: 49 }];
@@ -215,75 +203,41 @@ player.imgs[directions.right] = [{ x: 240, y: 96, w: 49, h: 49 }];
 player.imgs[directions.down] = [{ x: 191, y: 96, w: 49, h: 49 }];
 player.imgs[directions.left] = [{ x: 191, y: 145, w: 49, h: 49 }];
 
-// enemies //animation not working
-var e1 = new Sprite([1, 3], [1, 3], 0, [20, 20], [95, 35], 600);
-e1.imgs = [{ x: 273, y: 0, w: 43, h: 24, d: 200 },
-{ x: 316, y: 0, w: 43, h: 24, d: 200 }, { x: 359, y: 0, w: 43, h: 24, d: 200 }];
-e1.direction = directions.right;
-var e2 = new Sprite([1, 3], [1, 3], 0, [20, 20], [365, 275], 600);
-e2.imgs = [{ x: 273, y: 0, w: 43, h: 24, d: 200 },
-{ x: 316, y: 0, w: 43, h: 24, d: 200 }, { x: 359, y: 0, w: 43, h: 24, d: 200 }];
-
-//create an array of enemy objects to be looped through later
-var enemies = [e1, e2];
-
-//LOOT
+//object collisions
 var objectCollision = {
     none: 0,
     solid: 1
 }
 
-var objectTypes = {
-    1: {
-        name: 'gold',
-        img: [{ x: 191, y: 145, w: 49, h: 49 }],
-        collision: objectCollision.none
-    },
-    2: {
-        name: 'potion',
-        img: [{ x: 191, y: 145, w: 49, h: 49 }],
-        collision: objectCollision.none
-    },
-    3: {
-        name: 'key',
-        img: [{ x: 191, y: 145, w: 49, h: 49 }],
-        collision: objectCollision.none
-    }
-}
-
-class MapObject {
-    constructor(x, y, type, object) {
-        this.x = x;
-        this.y = y;
-        this.type = type;
-        this.object = object;
-    } 
-    placeAt(newX, newY) {
-        if (mapTileData.map[toIndex(this.x, this.y)].object == this) {
-            mapTileData.map[toIndex(this.x, this.y)].object = null;
-        }
-        this.x = newX;
-        this.y = newY;
-        mapTileData.map[toIndex(newX, newY)].object = this;
-    };
-}
-// // this isn't working
-// var mo1 = new MapObject;
-// mo1.type = 1; 
-// mo1.placeAt(2, 4);
-// mo1.object = mo1;
-// var mo2 = new MapObject(2); mo2.placeAt(2, 3);
-
 /* EVENT HANDLERS (GLOBAL) */
+button.addEventListener('click', btnClickHandler)
 
-//start button
-document.getElementById('start').addEventListener('click', startGame)
-
-//restart button
-document.getElementById('restart').addEventListener('click', restartGame)
-
+//Event Handlers (Game)
+window.addEventListener("keydown", function (evt) {
+    if (evt.keyCode >= 37 && evt.keyCode <= 40) {
+        keysDown[evt.keyCode] = true;
+    }
+});
+window.addEventListener("keyup", function (evt) {
+    if (evt.keyCode >= 37 && evt.keyCode <= 40) {
+        keysDown[evt.keyCode] = false;
+    }
+})
 
 /* FUNCTIONS */
+
+//button click handler
+function btnClickHandler() {
+    if (button.textContent ==  "Next Level") {
+        resetGame();
+    } else if (button.textContent = "Try Again") {
+        resetGame();
+
+    } else if (button.textContent = "Start Game") {
+        startGame();
+    }
+    render();
+}
 
 //Helper Function for finding EXACT position in the gameMap array
 function toIndex(x, y) {
@@ -321,8 +275,6 @@ TileMap.prototype.buildMapFromData = function (d, w, h) {
     return true;
 };
 
-//unlock door function
-
 function unlockDoor() {
     //not working
     //locked doors unlock
@@ -333,17 +285,58 @@ function unlockDoor() {
     console.log("I'm unlocked!");
 }
 
-function lootItem() {
-    score += 1;
-    gameMap[player.position[0],player.position[1]]
-}
-
 function takePotion() {
     player.health += 1;
     tileTypes[7].floor = floorTypes.path;
     tileTypes[7].img = [{ x: 0, y: 0, w: 64, h: 64 }];
 }
 
+function loseHeatlth() {
+    if (player.health <= 1) {
+        loseGame()
+
+    } else {
+        player.health -= 1;
+        return true;
+    }
+}
+
+//Game State Functions
+function resetGame() {
+    gameMap = levels[currentLevel];
+    running = true;
+    player = new Sprite([1, 1], [1, 1], 0, [20, 20], [35, 35], 400, 3);
+    player.imgs = {}
+    player.imgs[directions.up] = [{ x: 240, y: 145, w: 49, h: 49 }];
+    player.imgs[directions.right] = [{ x: 240, y: 96, w: 49, h: 49 }];
+    player.imgs[directions.down] = [{ x: 191, y: 96, w: 49, h: 49 }];
+    player.imgs[directions.left] = [{ x: 191, y: 145, w: 49, h: 49 }];
+    startGame();
+    initialize();
+}
+
+function winGame() {
+    console.log('you win!');
+    ctx = null;
+    panel = 'W';
+    running = false;
+    currentLevel +=1;
+    render();
+}
+
+function loseGame() {
+    console.log('you lose!');
+    ctx = null;
+    panel = 'L';
+    running = false;
+    render();
+}
+
+function initialize() {
+    player.health = 3;
+    running = false;
+    render();
+};
 
 //Animated Sprite function
 function getFrame(img, durration, time, animated) {
@@ -360,86 +353,11 @@ function getFrame(img, durration, time, animated) {
 
 };
 
-
-function restartGame() {
-    console.log('restart')
-    gameMap = level2;
-    startGame();
-    initialize();
-}
-
-//inventory function
-//if player character position === item position
-// pickup function
-//remove item from board
-//place in inventory
-
-//health functions
-
-function loseHeatlth() {
-    if (player.health <= 1) {
-        loseGame()
-
-    } else {
-        player.health -= 1;
-        return true;
-    }
-}
-
-//win logic
-function winGame() {
-    //launch win message
-    // ctx = null;
-    // ctx = document.getElementById('game').getContext("2d");
-    // document.getElementById('game').style.width = '600px';
-    // document.getElementById('game').style.height = '600px';
-    console.log('you win!');
-    ctx.fillStyle = 'pink';
-    ctx.fillRect(0, 0, 600, 600)
-    winner = true;
-    running = false;
-    gameMap = [];
-    player.position = [2,2];
-    enemies = [];
-
-}
-
-//lose logic
-function loseGame() {
-    // ctx = null;
-    // ctx = document.getElementById('game').getContext("2d");
-    // document.getElementById('game').style.width = '600px';
-    // document.getElementById('game').style.height = '600px';
-    console.log('you lose!');
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, 600, 600);
-    winner = true;
-    running = false;
-    gameMap = [];
-    player.position = [2,2];
-    enemies = [];
-}
-
-//Initialize function
-function initialize() {
-    //set upstate with start game button and default UI 
-    //(empty inventory, full health, 0 score, null key)
-    player.health = 3;
-    player.key = false;
-    player.position = player.position;
-    running = false;
-    winner = false;
-};
-
 function startGame() {
     //starts the loop
-    running = true;
     ctx = document.getElementById('game').getContext("2d");
-    /*  I need to refactor the code so that tile width and height 
-        have px after them but that doesn't disrupt the flow of the code
-        document.getElementById('game').style.width= '600px';
-        document.getElementById('game').style.height= '600px'; */
-
+    panel = 'C';
+    running = true;
     tileset = new Image();
     tileset.onerror = function () {
         ctx = null;
@@ -472,22 +390,9 @@ function startGame() {
     mapTileData.map[((2 * mapWidth) + 2)].eventEnter = function () { console.log("Entered tile 2,2"); };
 
     requestAnimationFrame(drawGame);
-    // ctx.font = "bold 10pt sans-serif";
-
-    //Event Handlers (Game)
-    window.addEventListener("keydown", function (evt) {
-        if (evt.keyCode >= 37 && evt.keyCode <= 40) {
-            keysDown[evt.keyCode] = true;
-        }
-    });
-    window.addEventListener("keyup", function (evt) {
-        if (evt.keyCode >= 37 && evt.keyCode <= 40) {
-            keysDown[evt.keyCode] = false;
-        }
-    })
 }
 
-//main function
+/* CANVAS RENDERING */
 function drawGame() {
     if (ctx === null) {
         return;
@@ -498,7 +403,6 @@ function drawGame() {
     }
 
     var currentFrameTime = Date.now();
-    // var timeElapsed = currentFrameTime - lastFrameTime;
 
     //frame counter
     var sec = Math.floor(Date.now() / 1000);
@@ -512,7 +416,7 @@ function drawGame() {
     }
 
     //Render board
-    if (winner !== true) {
+    if (running !== true) {
         for (var y = 0; y < mapHeight; y++) {
             for (var x = 0; x < mapWidth; x++) {
                 var tile = tileTypes[mapTileData.map[toIndex(x, y)].type];
@@ -540,22 +444,43 @@ function drawGame() {
         ctx.drawImage(tileset, playerImg[0].x, playerImg[0].y, playerImg[0].w, playerImg[0].h,
             player.position[0], player.position[1], player.dimensions[0], player.dimensions[1]);
 
-        //render enemies
-
-        enemies.forEach(function (e) {
-            var enemy = e;
-            var enemyImg = enemy.imgs;
-            ctx.drawImage(tileset, enemyImg[0].x, enemyImg[0].y, enemyImg[0].w, enemyImg[0].h,
-                enemy.position[0], enemy.position[1], enemy.dimensions[0], enemy.dimensions[1]);
-        });
-
         ctx.fillStyle = "#ff0000";
         // ctx.fillText(framesLastSecond, 10, 20);
         lastFrameTime = currentFrameTime;
         // requestAnimationFrame(drawGame);
         if (!running) requestAnimationFrame(drawGame);
+        render()
     };
 }
 
-startGame();
+/* DOM RENDERING */
+function render() {
+    
+    switch (panel) {
+        case 'C' :
+            button.style.display =  'none';
+            break;
+            case 'S' :
+            button.textContent = "Start Game";
+            button.style.display =  'block';
+            break;
+            case 'W' :
+            button.textContent = "Next Level";
+            button.style.display =  'block';
+            break;
+            case 'L' :
+            button.textContent = "Try Again!"
+            button.style.display =  'block';
+            break;
+    }
+    
+    canvas.style.display = panel === 'C' ? 'block' : 'none';
+    startEl.style.display = panel === 'S' ? 'block' : 'none';
+    winEl.style.display = panel === 'W' ? 'block' : 'none';
+    loseEl.style.display = panel === 'L' ? 'block' : 'none';
+    levelDisplay.textContent = currentLevel;
+    healthDisplay.textContent = player.health;
+}
+
+render();
 initialize();

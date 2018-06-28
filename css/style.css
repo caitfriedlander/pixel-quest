@@ -20,20 +20,40 @@ h1 {
     align-items: center;
 }
 
+.panel {
+    width: 600px;
+    height: 600px;
+    display: none;
+}
+
+#start {
+    background-color: pink;
+}
+
+#win {
+    background-color: blue;
+}
+
+#lose {
+    background-color: red;
+}
+
 aside {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
     width: 200px;
-    height: 500px;
-    padding: 15px;
+    height: 578px;
+    padding: 10px;
     border: 1px black solid;
+    margin-left: 30px;
 }
 
 footer {
     margin: 0 auto;
     text-align: center;
     border: 1px black solid;
-    padding: 15px;
+    padding: 20px;
+     width: 840px;
 }
