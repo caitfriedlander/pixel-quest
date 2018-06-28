@@ -46,6 +46,8 @@ var gameMap = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0
 ];
 
+var mapTileData = new TileMap();
+
 var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4, key: 5, loot: 6 }
 
 var tileTypes = {
@@ -92,7 +94,7 @@ class Sprite {
         this.imgs =imgs;
     }
     //image methods
-
+    
     //places the sprite on the board
     placeAt(x,y) {
         this.tileFrom = [x,y];
@@ -110,6 +112,8 @@ class Sprite {
             if ((t-this.timeMoved) >= this.speed) {
                 //move tile and keep it from moving without user input
                 this.placeAt(this.tileTo[0], this.tileTo[1]);
+                var tileFloor = tileTypes[mapTileData.map[toIndex(this.tileFrom[0], 
+                    this.tileFrom[1])].type].floor;
             } else {
                 this.position[0] = (this.tileFrom[0] * tileWidth) + ((tileWidth - this.dimensions[0])/2);
                 this.position[1] = (this.tileFrom[1] * tileHeight) + ((tileHeight - this.dimensions[1])/2);
@@ -142,36 +146,36 @@ class Sprite {
         console.log(pos);
         switch (pos) {
             case (floorTypes.path) :
-                return true;
-                break;
+            return true;
+            break;
             case floorTypes.solid :
-                console.log('nope')
-                return false;
-                break;
+            console.log('nope')
+            return false;
+            break;
             case (floorTypes.trap) :
-                loseHeatlth();
+            loseHeatlth();
                 console.log('ow');
                 return true;
                 break;
             case (floorTypes.key) :
-                //not working because the game is not detecting this floortype
-                //it's registering as a path
-                unlockDoor();
-                console.log('unlocked!')
-                return false;
-                break;
+            //not working because the game is not detecting this floortype
+            //it's registering as a path
+            unlockDoor();
+            console.log('unlocked!')
+            return false;
+            break;
             case floorTypes.lockedDoor :
-                console.log('locked!')
-                return false;
-                break;
+            console.log('locked!')
+            return false;
+            break;
             case floorTypes.unlockedDoor :
-                console.log("you win!")
-                winGame()
-                return true;
-                break;
+            console.log("you win!")
+            winGame()
+            return true;
+            break;
             case floorTypes.loot :
-                return true;
-                break;
+            return true;
+            break;
         }
     };
     //moves the character to an available space in the corresponding direction
@@ -202,7 +206,7 @@ class Sprite {
     };
     
 };
-    
+
 // player
 player = new Sprite([1,1], [1,1], 0, [20, 20], [35,35], 400, 3);
 player.imgs = {}
@@ -215,25 +219,25 @@ player.imgs[directions.left] = [{x:191, y:145, w:49, h:49}];
 var e1 = new Sprite([1,3], [1,3], 0, [20, 20], [95,35], 600);
 e1.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
     {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
-e2.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
-    {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
-
-//create an array of enemy objects to be looped through later
-var enemies = [e1, e2];
-
-//each enemy needs a unique starting position and a movement method
-
-//LOOT
-var objectCollision = {
-    none: 0,
-    solid: 1
-}
-var objectTypes = {
-    1: {
-        name: 'gold',
-
-    }
+    var e2 = new Sprite([1,3], [1,3], 0, [20, 20], [365, 275], 600);
+    e2.imgs = [{x:273, y:0, w:43, h:24, d:200}, 
+        {x:316, y:0, w:43, h:24, d:200}, {x:359, y:0, w:43, h:24, d:200}];
+        
+        //create an array of enemy objects to be looped through later
+        var enemies = [e1, e2];
+        
+        //each enemy needs a unique starting position and a movement method
+        
+        //LOOT
+        var objectCollision = {
+            none: 0,
+            solid: 1
+        }
+        var objectTypes = {
+            1: {
+                name: 'gold',
+                
+            }
 }
 
 
@@ -244,7 +248,7 @@ var inventoryArr = [
     0, 0, 0,
     0, 0, 0
 ];
-    
+
 /* EVENT HANDLERS (GLOBAL) */
 
 //start button
@@ -260,6 +264,40 @@ document.getElementById('restart').addEventListener('click', restartGame)
 function toIndex(x,y) {
     return ((y * mapWidth) + x);
 }
+
+function Tile(tx, ty, tt)
+{
+    this.x			= tx;
+    this.y			= ty;
+    this.type		= tt;
+}
+
+function TileMap()
+{
+    this.map	= [];
+    this.w		= 0;
+    this.h		= 0;
+}
+
+TileMap.prototype.buildMapFromData = function(d, w, h)
+{
+    this.w		= w;
+    this.h		= h;
+    
+    if(d.length!=(w*h)) { return false; }
+    
+    this.map.length	= 0;
+    
+    for(var y = 0; y < h; y++)
+    {
+        for(var x = 0; x < w; x++)
+        {
+            this.map.push( new Tile(x, y, d[((y*w)+x)]) );
+        }
+    }
+    
+    return true;
+};
 
 //find exact player position
 function playerFinder(player) {
@@ -338,6 +376,10 @@ function startGame() {
             tileTypes[x]['durration'] = t;
         }
     };
+
+    mapTileData.buildMapFromData(gameMap, mapWidth, mapHeight);
+	mapTileData.map[((2*mapWidth)+2)].eventEnter = function()
+		{ console.log("Entered tile 2,2"); };
 
     requestAnimationFrame(drawGame);
     // ctx.font = "bold 10pt sans-serif";
@@ -444,7 +486,7 @@ function drawGame() {
     if (winner !== true) {    
         for (var y = 0; y < mapHeight; y++) {
             for (var x = 0; x < mapWidth; x++) {
-            var tile = tileTypes[gameMap[toIndex(x,y)]];
+                var tile = tileTypes[mapTileData.map[toIndex(x,y)].type];
             var img = getFrame(tile.img, tile.durration, currentFrameTime, tile.animated);
             ctx.drawImage(tileset, img.x, img.y, img.w, img.h, (x*tileWidth), (y*tileHeight), 
             tileWidth, tileHeight);
