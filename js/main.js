@@ -184,6 +184,9 @@ class Sprite {
             case floorTypes.loot:
                 return true;
                 break;
+            case undefined:
+                return false;
+                break;
             default:
                 return false;
         }
@@ -343,10 +346,9 @@ function playerFinder(player) {
 
 function unlockDoor() {
     //not working
-    player.key = true;
     //locked doors unlock
-    floorTypes.lockedDoor = floorTypes.unlockedDoor;
-    floorTypes.doorkey = floorTypes.path;
+    tileTypes[4].floor = floorTypes.unlockedDoor;
+    tileTypes[6].floor = floorTypes.path;
     tileTypes[4].img = [{ x: 0, y: 64, w: 64, h: 64 }];
     tileTypes[6].img = [{ x: 0, y: 0, w: 64, h: 64 }];
     console.log("I'm unlocked!");
@@ -492,7 +494,8 @@ function loseGame() {
     document.getElementById('game').style.height = '600px';
     console.log('you lose!');
     ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, 600, 600)
+    ctx.fillRect(0, 0, 600, 600);
+    winner = true;
     running = false;
     gameMap = [];
     player.position = [];
@@ -565,8 +568,9 @@ function drawGame() {
         // ctx.fillText(framesLastSecond, 10, 20);
         lastFrameTime = currentFrameTime;
         // requestAnimationFrame(drawGame);
-        if (running == true) requestAnimationFrame(drawGame);
+        if (!running) requestAnimationFrame(drawGame);
     };
 }
 
+startGame();
 initialize();
