@@ -177,6 +177,29 @@ function resetGame() {
     player.imgs[directions.right] = [{ x: 240, y: 96, w: 49, h: 49 }];
     player.imgs[directions.down] = [{ x: 191, y: 96, w: 49, h: 49 }];
     player.imgs[directions.left] = [{ x: 191, y: 145, w: 49, h: 49 }];
+    tileTypes = {
+        //horizontal walls
+        0: { floor: floorTypes.solid, img: [{ x: 64, y: 128, w: 64, h: 64 }] },
+        //vertical walls
+        1: { floor: floorTypes.solid, img: [{ x: 128, y: 128, w: 64, h: 64 }] },
+        //regular floor
+        2: { floor: floorTypes.path, img: [{ x: 0, y: 0, w: 64, h: 64 }] },
+        //trapped floor
+        3: {
+            floor: floorTypes.trap, img: [{ x: 64, y: 0, w: 64, h: 64, d: 1500 },
+            { x: 128, y: 0, w: 64, h: 64, d: 1500 }]
+        },
+        //locked door
+        4: { floor: floorTypes.lockedDoor, img: [{ x: 64, y: 64, w: 64, h: 64 }] },
+        //unlocked door
+        5: { floor: floorTypes.unlockedDoor, img: [{ x: 0, y: 64, w: 64, h: 64 }] },
+        //doorkey
+        6: { floor: floorTypes.doorkey, img: [{ x: 128, y: 64, w: 64, h: 64 }] },
+        //potion
+        7: { floor: floorTypes.potion, img: [{ x: 294, y: 128, w: 64, h: 64 }] },
+        //door
+        8: { floor: floorTypes.solid, img: [{ x: 64, y: 64, w: 64, h: 64 }] }
+    };
     startGame();
     initialize();
 }

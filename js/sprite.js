@@ -79,8 +79,8 @@ class Sprite {
                 return true;
                 break;
             case floorTypes.doorkey:
-                //not working because the game is not detecting this floortype
-                //it's registering as a path
+                pos = floorTypes.path;
+                tileTypes[gameMap[toIndex(x, y)]].imgs = [{ x: 0, y: 64, w: 64, h: 64 }];
                 unlockDoor();
                 return true;
                 break;
