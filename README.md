@@ -23,4 +23,6 @@ The tiles for the map came from [The Game Asset Mine](https://thegameassetsmine.
 
 Font is [Pixelar by Graviton](https://www.fonts.com/font/graviton/pixelar?QueryFontType=Web&src=GoogleWebFonts).
 
+## Icebox
 
+I would like to implement a few additional features in the future including enemies (with collision detection and pathfinding), timed traps so that you can walk over them safely if you move quickly enough, and a loot/score system. Additionally I would like to add more levels and improve the look and overall feel of the dungeon graphics itself.
