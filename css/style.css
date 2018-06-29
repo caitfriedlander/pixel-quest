@@ -32,7 +32,7 @@ body {
 h1 {
     text-align: center;
     font-size: 80px;
-    margin: -10px 0 -80px;
+    margin: -10px 0 -30px;
     color: goldenrod;
 }
 
@@ -118,7 +118,8 @@ p {
 aside > div > h2 {
     font-size: 30px;
     color: goldenrod;
-    margin-top: 10px
+    margin-top: 50px;
+    margin-bottom: 50px;
 }
 
 aside > div > div {
@@ -134,7 +135,7 @@ aside > div > div {
 
 .button {
     box-sizing: border-box;
-    margin-top: -20px;
+    margin-top: 80px;
     height: 300px;
 }
 
@@ -144,5 +145,25 @@ aside > div > div {
     background-color: gold;
     border: 1px solid orange;
     font-size: 15px;
-    margin-bottom: 40px;
+    margin-bottom: 60px;
+    outline: none;
+}
+
+#button:hover {
+    background-color:orange;
+}
+
+footer {
+    text-align: center;
+    color: goldenrod;
+    margin-top: -40px;
+}
+
+a {
+    text-decoration: none;
+    color: gold;
+}
+
+canvas {
+    border: 4px darkgoldenrod dashed;
 }
