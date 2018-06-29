@@ -58,6 +58,7 @@ var healthDisplay = document.getElementById('health');
 var tilesetURL = "images/pixel-quest-imgs-small.png";
 var startEl = document.getElementById('start');
 var winEl = document.getElementById('win');
+var winGameEl = document.getElementById('gameWin');
 var loseEl = document.getElementById('lose');
 
 
@@ -177,6 +178,7 @@ function resetGame() {
     player.imgs[directions.right] = [{ x: 240, y: 96, w: 49, h: 49 }];
     player.imgs[directions.down] = [{ x: 191, y: 96, w: 49, h: 49 }];
     player.imgs[directions.left] = [{ x: 191, y: 145, w: 49, h: 49 }];
+    var floorTypes = { solid: 0, path: 1, lockedDoor: 2, unlockedDoor: 3, trap: 4, doorkey: 5, potion: 6 };
     tileTypes = {
         //horizontal walls
         0: { floor: floorTypes.solid, img: [{ x: 64, y: 128, w: 64, h: 64 }] },
@@ -381,6 +383,12 @@ function render() {
     loseEl.style.display = panel === 'L' ? 'block' : 'none';
     levelDisplay.textContent = currentLevel + 1;
     healthDisplay.textContent = player.health;
+
+    if (currentLevel >= levels.length - 1) {
+        button.style.display = 'none';
+        winGameEl.style.display = 'block';
+        winEl.style.display = 'none';
+    }
 }
 
 render();
