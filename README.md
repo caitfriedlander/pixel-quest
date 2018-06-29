@@ -8,11 +8,11 @@ It was built with HTML5 Canvas, HTML, CSS, and Javascript in about a week. Using
 
 The witch sprite images came from [VX Resource Planet](https://vxresource.wordpress.com/2013/02/19/a-witch-for-rpg-maker-vx-ace/).
 
-[Witch](/images/w)
+![Witch](/images/w)
 
 The tiles for the map came from [The Game Asset Mine](https://thegameassetsmine.com/product/pixel-art-top-down-dungeon-level-2/).
 
-[Tiles](https://thegameassetsmine.com/wp-content/uploads/2018/04/Top-Down-dungeon-stage-2-Cover.jpg)
+![Tiles](https://thegameassetsmine.com/wp-content/uploads/2018/04/Top-Down-dungeon-stage-2-Cover.jpg)
 
 Font is [Pixelar by Graviton](https://www.fonts.com/font/graviton/pixelar?QueryFontType=Web&src=GoogleWebFonts).
 
