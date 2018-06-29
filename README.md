@@ -8,7 +8,7 @@ It was built with HTML5 Canvas, HTML, CSS, and Javascript in about a week. Using
 
 The witch sprite images came from [VX Resource Planet](https://vxresource.wordpress.com/2013/02/19/a-witch-for-rpg-maker-vx-ace/).
 
-![Witch](/images/w)
+![Witch](/images/witch2.png)
 
 The tiles for the map came from [The Game Asset Mine](https://thegameassetsmine.com/product/pixel-art-top-down-dungeon-level-2/).
 
