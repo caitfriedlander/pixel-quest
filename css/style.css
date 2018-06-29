@@ -1,5 +1,24 @@
+/* @font-face {
+    font-family: 'mobile_fontregular';
+    src: url('mobile-font.regular-webfont.woff2') format('woff2'),
+         url('mobile-font.regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'disposabledroid_bbregular';
+    src: url('disposabledroid-bb.regular-webfont.woff2') format('woff2'),
+         url('disposabledroid-bb.regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+} */
+
 html,body {
     height: 100%;
+    background-color: black;
 }
 
 body {
@@ -7,10 +26,14 @@ body {
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
+    font-family: 'mobile_fontregular'
 }
 
 h1 {
     text-align: center;
+    font-size: 80px;
+    margin: -10px 0 -80px;
+    color: goldenrod;
 }
 
 #container {
@@ -24,18 +47,47 @@ h1 {
     width: 600px;
     height: 600px;
     display: none;
+    border: 4px darkgoldenrod dashed;
+    color: gold;
+    text-align: center;
+    margin-top: 0 auto;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.witch {
+    height: 80px;
+    margin-top: 20px;
+    margin-bottom: -20px;
+    animation: blink 1.8s;
+    animation-iteration-count: infinite;
+}
+
+.holder {
+    margin-top: 20%;
+    font-size: 80px;
 }
 
 #start {
-    background-color: pink;
+    background-color: black;
 }
 
 #win {
-    background-color: blue;
+    background-color: black;
 }
 
 #lose {
-    background-color: red;
+    background-color: black;
 }
 
 aside {
@@ -46,14 +98,51 @@ aside {
     width: 200px;
     height: 578px;
     padding: 10px;
-    border: 1px black solid;
+    border: 4px darkgoldenrod dashed;
     margin-left: 30px;
+    background-color: black;
 }
 
-footer {
+.instructions {
     margin: 0 auto;
     text-align: center;
-    border: 1px black solid;
     padding: 20px;
-     width: 840px;
+    width: 80%;
+    line-height: 30px;
+}
+
+p {
+    font-size: 20px;
+}
+
+aside > div > h2 {
+    font-size: 30px;
+    color: goldenrod;
+    margin-top: 10px
+}
+
+aside > div > div {
+    background-color: white;
+    border: 1px goldenrod dashed;
+    border-radius: 25px;
+    padding: 20px;
+    width: 50px;
+    text-align: center;
+    margin-top: 10px;
+
+}
+
+.button {
+    box-sizing: border-box;
+    margin-top: -20px;
+    height: 300px;
+}
+
+#button {
+    padding: 10px;
+    border-radius: 25px;
+    background-color: gold;
+    border: 1px solid orange;
+    font-size: 15px;
+    margin-bottom: 40px;
 }

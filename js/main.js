@@ -38,17 +38,7 @@ var tilesetLoaded = false;
 var levels = [level0, level1, level2];
 var currentLevel = 0;
 
-/* Cached Elements */
-var button = document.getElementById('button');
-var canvas = document.querySelector('canvas');
-var levelDisplay = document.getElementById('level');
-var healthDisplay = document.getElementById('health');
-var tilesetURL = "images/pixel-quest-imgs-small.png";
-var startEl = document.getElementById('start');
-var winEl = document.getElementById('win');
-var loseEl = document.getElementById('lose');
-
-//GAME MAP
+//Game Map Constants
 var gameMap = levels[currentLevel];
 
 var mapTileData = new TileMap();
@@ -59,6 +49,17 @@ var directions = {
     down: 2,
     left: 3
 };
+
+/* Cached Elements */
+var button = document.getElementById('button');
+var canvas = document.querySelector('canvas');
+var levelDisplay = document.getElementById('level');
+var healthDisplay = document.getElementById('health');
+var tilesetURL = "images/pixel-quest-imgs-small.png";
+var startEl = document.getElementById('start');
+var winEl = document.getElementById('win');
+var loseEl = document.getElementById('lose');
+
 
 // PLAYER
 player = new Sprite([1, 1], [1, 1], 0, [20, 20], [35, 35], 400, 3);
@@ -182,18 +183,28 @@ function resetGame() {
 
 function winGame() {
     console.log('you win!');
-    ctx = null;
     panel = 'W';
     running = false;
+    player = new Sprite([1, 1], [1, 1], 0, [20, 20], [35, 35], 400, 3);
+    player.imgs = {}
+    player.imgs[directions.up] = [{ x: 240, y: 145, w: 49, h: 49 }];
+    player.imgs[directions.right] = [{ x: 240, y: 96, w: 49, h: 49 }];
+    player.imgs[directions.down] = [{ x: 191, y: 96, w: 49, h: 49 }];
+    player.imgs[directions.left] = [{ x: 191, y: 145, w: 49, h: 49 }];
     if (currentLevel < levels.length - 1) currentLevel += 1;
     render();
 }
 
 function loseGame() {
     console.log('you lose!');
-    ctx = null;
     panel = 'L';
     running = false;
+    player = new Sprite([1, 1], [1, 1], 0, [20, 20], [35, 35], 400, 3);
+    player.imgs = {}
+    player.imgs[directions.up] = [{ x: 240, y: 145, w: 49, h: 49 }];
+    player.imgs[directions.right] = [{ x: 240, y: 96, w: 49, h: 49 }];
+    player.imgs[directions.down] = [{ x: 191, y: 96, w: 49, h: 49 }];
+    player.imgs[directions.left] = [{ x: 191, y: 145, w: 49, h: 49 }];
     render();
 }
 

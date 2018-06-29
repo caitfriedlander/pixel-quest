@@ -89,7 +89,6 @@ class Sprite {
                 return false;
                 break;
             case floorTypes.unlockedDoor:
-                console.log("you win!")
                 winGame()
                 return true;
                 break;
