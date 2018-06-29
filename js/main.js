@@ -35,7 +35,7 @@ var tileWidth = 30, tileHeight = 30;
 var mapWidth = 20, mapHeight = 20;
 var tileset = null;
 var tilesetLoaded = false;
-var levels = [level0, level1, level2];
+var levels = [level0, level1, level2, level3];
 var currentLevel = 0;
 
 //Game Map Constants
@@ -384,10 +384,10 @@ function render() {
     levelDisplay.textContent = currentLevel + 1;
     healthDisplay.textContent = player.health;
 
-    if (currentLevel >= levels.length - 1) {
-        button.style.display = 'none';
-        winGameEl.style.display = 'block';
+    if (currentLevel >= levels.length -1) {
         winEl.style.display = 'none';
+        winGameEl.style.display = 'block';
+        button.style.display = 'none';
     }
 }
 
