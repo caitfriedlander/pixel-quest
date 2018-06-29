@@ -2,7 +2,7 @@
 
 ![PQ](https://i.imgur.com/QK42cDG.png)
 
-[Enter the dungeon, if you dare!](https://caitfriedlander.github.io/pixel-quest/)
+## [Enter the dungeon, if you dare!](https://caitfriedlander.github.io/pixel-quest/)
 
 Pixel Quest is an 8-bit style dungeon crawler RPG that calls to mind vintage video games and classic Dungeons & Dragons adventures. In **Pixel Quest** you stear a little witch sprite through a set of trap filled dungeon mazes, trying to pick up the key to the dungeon before you run out of health. There is one health potion available on each map and it's up to the player to solve the puzzel of how to navigate the map most efficiently.
 
