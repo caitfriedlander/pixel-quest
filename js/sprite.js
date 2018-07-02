@@ -1,7 +1,7 @@
 //SPRITES
 //move to seprate file sprite.js
 class Sprite {
-    constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, inventory, direction, key, imgs) {
+    constructor(tileFrom, tileTo, timeMoved, dimensions, position, speed, health, direction, imgs) {
         this.tileFrom = tileFrom;
         this.tileTo = tileTo;
         this.timeMoved = timeMoved;
@@ -9,9 +9,7 @@ class Sprite {
         this.position = position;
         this.speed = speed;
         this.health = health;
-        this.inventory = inventory;
         this.direction = directions.down;
-        this.key = key;
         this.imgs = imgs;
     }
     //places the sprite on the board

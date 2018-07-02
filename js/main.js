@@ -40,11 +40,10 @@
     var tilesetLoaded = false;
     var levels = [level0, level1, level2, level3];
     var currentLevel = 0;
+    var mapTileData;
 
     //Game Map Constants
     var gameMap = levels[currentLevel];
-
-    var mapTileData = new TileMap();
 
     var directions = {
         up: 0,
@@ -58,11 +57,11 @@
     var canvas = document.querySelector('canvas');
     var levelDisplay = document.getElementById('level');
     var healthDisplay = document.getElementById('health');
-    var tilesetURL = "images/pixel-quest-imgs-small.png";
     var startEl = document.getElementById('start');
     var winEl = document.getElementById('win');
     var winGameEl = document.getElementById('gameWin');
     var loseEl = document.getElementById('lose');
+    var tilesetURL = "images/pixel-quest-imgs-small.png";
 
 
     // PLAYER
@@ -122,30 +121,33 @@
         this.object = null;
     }
 
-    function TileMap() {
-        this.map = [];
-        this.w = 0;
-        this.h = 0;
-        this.object = null;
+    //game map engine
+    class TileMap {
+        constructor (map, w, h, object) {
+            this.map = map;
+            this.w = w;
+            this.h = h;
+            this.object = object;
+        }
+        buildMapFromData(d, w, h) {
+            this.w = w;
+            this.h = h;
+
+            if (d.length != (w * h)) { return false; }
+
+            this.map.length = 0;
+
+            for (var y = 0; y < h; y++) {
+                for (var x = 0; x < w; x++) {
+                    this.map.push(new Tile(x, y, d[((y * w) + x)]));
+                }
+            }
+
+            return true;
+        };
     }
 
-    //game map engine
-    TileMap.prototype.buildMapFromData = function (d, w, h) {
-        this.w = w;
-        this.h = h;
-
-        if (d.length != (w * h)) { return false; }
-
-        this.map.length = 0;
-
-        for (var y = 0; y < h; y++) {
-            for (var x = 0; x < w; x++) {
-                this.map.push(new Tile(x, y, d[((y * w) + x)]));
-            }
-        }
-
-        return true;
-    };
+    mapTileData = new TileMap([], 0, 0, null);
 
     //Player Class Mechanics
     function unlockDoor() {
@@ -389,5 +391,4 @@
         }
     }
 
-    render();
     initialize();

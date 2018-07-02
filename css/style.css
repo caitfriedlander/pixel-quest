@@ -1,21 +1,3 @@
-/* @font-face {
-    font-family: 'mobile_fontregular';
-    src: url('mobile-font.regular-webfont.woff2') format('woff2'),
-         url('mobile-font.regular-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-
-}
-
-@font-face {
-    font-family: 'disposabledroid_bbregular';
-    src: url('disposabledroid-bb.regular-webfont.woff2') format('woff2'),
-         url('disposabledroid-bb.regular-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-
-} */
-
 html,body {
     height: 100%;
     background-color: black;
